@@ -1,13 +1,11 @@
-import { bubbleSets } from './LayersPlugin';
+import { layers } from './LayersPlugin';
 export * from './LayersPlugin';
-export { default as BubbleSetsPlugin } from './LayersPlugin';
-export * from './BubbleSetPath';
-export { default as BubbleSetPath } from './BubbleSetPath';
+export { default as LayersPlugin } from './LayersPlugin';
 
 export default function register(
   cytoscape: (type: 'core' | 'collection' | 'layout', name: string, extension: any) => void
 ) {
-  cytoscape('core', 'bubbleSets', bubbleSets);
+  cytoscape('core', 'layers', layers);
 }
 
 // auto register
@@ -20,6 +18,6 @@ export declare namespace cytoscape {
   function use(module: Ext2): void;
 
   interface Core {
-    bubbleSets: typeof bubbleSets;
+    layers: typeof layers;
   }
 }
