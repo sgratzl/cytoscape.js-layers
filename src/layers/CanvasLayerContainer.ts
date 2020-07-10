@@ -1,17 +1,28 @@
-import { ILayerContainer } from './interfaces';
+import { ILayerContainer, ILayer } from './interfaces';
 import { layerStyle } from './utils';
 
 export class CanvasLayerContainer implements ILayerContainer {
   readonly node: HTMLCanvasElement;
   readonly ctx: CanvasRenderingContext2D;
   private readonly pixelRatio: number;
-  private readonly layers: ((ctx: CanvasRenderingContext2D) => void)[] = [];
+  readonly layers: { draw: () => void; render: (ctx: CanvasRenderingContext2D) => void }[] = [];
 
   constructor(doc: Document, options: Partial<CanvasRenderingContext2DSettings & { pixelRatio: number }> = {}) {
     this.node = doc.createElement('canvas');
     Object.assign(this.node.style, layerStyle);
     this.pixelRatio = options.pixelRatio ?? (window ?? {}).devicePixelRatio ?? 1;
     this.ctx = this.node.getContext('2d', options)!;
+  }
+
+  get length() {
+    return this.layers.length;
+  }
+
+  indexOf(layer: ILayer) {
+    if (layer.type !== 'canvas') {
+      return -1;
+    }
+    return this.layers.findIndex((d) => d.draw === layer.draw);
   }
 
   resize(width: number, height: number) {
@@ -27,13 +38,16 @@ export class CanvasLayerContainer implements ILayerContainer {
     ctx.setTransform(bak);
   }
 
-  update() {
+  readonly draw = () => {
     this.clearCanvas();
     this.ctx.save();
 
-    // TODO
+    for (const layer of this.layers) {
+      layer.render(this.ctx);
+    }
+
     this.ctx.restore();
-  }
+  };
 
   setViewport(tx: number, ty: number, zoom: number) {
     this.ctx.resetTransform();
@@ -46,7 +60,16 @@ export class CanvasLayerContainer implements ILayerContainer {
     this.node.remove();
   }
 
-  pushLayer(render: (ctx: CanvasRenderingContext2D) => void) {
-    this.layers.push(render);
+  pushLayer(render: (ctx: CanvasRenderingContext2D) => void, draw = () => this.draw()) {
+    this.layers.push({ draw, render });
+    return draw;
+  }
+
+  removeLayer(draw: () => void) {
+    const index = this.layers.findIndex((d) => d.draw === draw);
+    if (index < 0) {
+      return;
+    }
+    this.layers.splice(index, 1);
   }
 }

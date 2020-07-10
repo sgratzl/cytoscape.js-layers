@@ -1,4 +1,4 @@
-import { ILayerContainer } from './interfaces';
+import { ILayerContainer, ILayer } from './interfaces';
 import { layerStyle } from './utils';
 
 export class SVGLayerContainer implements ILayerContainer {
@@ -15,6 +15,17 @@ export class SVGLayerContainer implements ILayerContainer {
     return this.node.firstElementChild! as SVGGElement;
   }
 
+  get length() {
+    return this.root.childElementCount;
+  }
+
+  indexOf(layer: ILayer) {
+    if (layer.type !== 'svg') {
+      return -1;
+    }
+    return Array.from(this.root.children).indexOf(layer.node);
+  }
+
   resize() {
     // dummy
   }
@@ -29,9 +40,5 @@ export class SVGLayerContainer implements ILayerContainer {
 
   createLayer() {
     return this.root.ownerDocument.createElementNS(SVGLayerContainer.NS, 'g');
-  }
-
-  update() {
-    // dummy
   }
 }

@@ -1,4 +1,4 @@
-import { ILayerContainer } from './interfaces';
+import { ILayerContainer, ILayer } from './interfaces';
 import { layerStyle } from './utils';
 
 export class HTMLLayerContainer implements ILayerContainer {
@@ -8,6 +8,21 @@ export class HTMLLayerContainer implements ILayerContainer {
     this.node = doc.createElement('div');
     Object.assign(this.node.style, layerStyle);
     this.node.style.overflow = 'hidden';
+  }
+
+  get root() {
+    return this.node;
+  }
+
+  get length() {
+    return this.root.childElementCount;
+  }
+
+  indexOf(layer: ILayer) {
+    if (layer.type !== 'html') {
+      return -1;
+    }
+    return Array.from(this.root.children).indexOf(layer.node);
   }
 
   resize() {
@@ -22,9 +37,6 @@ export class HTMLLayerContainer implements ILayerContainer {
     this.node.remove();
   }
 
-  update() {
-    // dummy
-  }
 
   createLayer() {
     return this.node.ownerDocument.createElement('div');

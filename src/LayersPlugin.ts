@@ -1,19 +1,16 @@
 import cy from 'cytoscape';
 import {
-  ILayerContainer,
-  IMoveAbleLayer,
-  ILayerFunction,
-  ICustomLayer,
-  ICytoscapeLayer,
-  ILayer,
-  SVGLayerContainer,
-  ISVGLayer,
-  IContainerLayer,
   CanvasLayerContainer,
   HTMLLayerContainer,
-  IHTMLLayer,
-  ICanvasLayer,
+  IContainerLayer,
+  ICytoscapeDragLayer,
+  ICytoscapeNodeLayer,
+  ICytoscapeSelectBoxLayer,
+  ILayer,
+  ILayerContainer,
+  ILayerFunction,
   IRelativeLayerFunction,
+  SVGLayerContainer,
 } from './layers';
 
 export default class LayersPlugin {
@@ -21,19 +18,30 @@ export default class LayersPlugin {
   private readonly containers: ILayerContainer[] = [];
   private readonly layers: IContainerLayer[] = [];
 
-  readonly nodeLayer: ICytoscapeLayer;
-  readonly dragLayer: ICytoscapeLayer;
-  readonly selectBoxLayer: ICytoscapeLayer;
+  readonly nodeLayer: ICytoscapeNodeLayer;
+  readonly dragLayer: ICytoscapeDragLayer;
+  readonly selectBoxLayer: ICytoscapeSelectBoxLayer;
 
   constructor(cy: cy.Core) {
     this.cy = cy;
 
     const container = cy.container()!;
 
-    // change z-indices to have more space between
-    for (const layer of Array.from(container.querySelectorAll<HTMLElement>('[data-id^=layer]'))) {
-      layer.style.zIndex = `${layer.style.zIndex}0`;
-    }
+    this.nodeLayer = this.initLayer({
+      node: container.querySelector<HTMLCanvasElement>('[data-id="layer0-node"]')!,
+      type: 'node',
+      container: null,
+    }) as ICytoscapeNodeLayer;
+    this.dragLayer = this.initLayer({
+      node: container.querySelector<HTMLCanvasElement>('[data-id="layer1-drag"]')!,
+      type: 'drag',
+      container: null,
+    }) as ICytoscapeDragLayer;
+    this.selectBoxLayer = this.initLayer({
+      node: container.querySelector<HTMLCanvasElement>('[data-id="layer0-node"]')!,
+      type: 'select-box',
+      container: null,
+    }) as ICytoscapeSelectBoxLayer;
 
     cy.on('viewport', this.zoomed);
     cy.on('resize', this.resize);
@@ -45,7 +53,7 @@ export default class LayersPlugin {
   }
 
   get root() {
-    return this.cy.container()!.firstElementChild!;
+    return this.cy.container()!.querySelector('[data-id]')!.parentElement as HTMLElement;
   }
 
   getLayers(): readonly ILayer[] {
@@ -94,7 +102,9 @@ export default class LayersPlugin {
   update() {
     this.zoomed();
     for (const container of this.containers) {
-      container.update();
+      if (container instanceof CanvasLayerContainer) {
+        container.draw();
+      }
     }
   }
 
@@ -113,10 +123,11 @@ export default class LayersPlugin {
   };
 
   readonly insertBefore: IRelativeLayerFunction = (
-    layer: ILayer,
+    _layer: ILayer,
     type: 'svg' | 'canvas' | 'html',
     render?: (ctx: CanvasRenderingContext2D) => void
   ): any => {
+    // TODO
     switch (type) {
       case 'svg':
         return this.appendSVG();
@@ -127,14 +138,30 @@ export default class LayersPlugin {
     }
   };
 
-  getLastLayer() {
+  readonly insertAfter: IRelativeLayerFunction = (
+    _layer: ILayer,
+    type: 'svg' | 'canvas' | 'html',
+    render?: (ctx: CanvasRenderingContext2D) => void
+  ): any => {
+    // TODO
+    switch (type) {
+      case 'svg':
+        return this.appendSVG();
+      case 'canvas':
+        return this.appendCanvas(render!);
+      case 'html':
+        return this.appendHTML();
+    }
+  };
+
+  getLast() {
     if (this.layers.length === 0) {
       return null;
     }
     return this.layers[this.layers.length - 1];
   }
 
-  getFirstLayer() {
+  getFirst() {
     if (this.layers.length === 0) {
       return null;
     }
@@ -144,16 +171,73 @@ export default class LayersPlugin {
   private removeLayer(layer: IContainerLayer) {
     const index = this.layers.indexOf(layer);
     if (index < 0) {
-      return;
+      return false;
     }
     this.layers.splice(index, 1);
     const container = layer.container;
     if (!container) {
+      return true;
+    }
+    if (container.length > 1) {
+      switch (layer.type) {
+        case 'svg':
+        case 'html':
+          layer.node.remove();
+          break;
+        case 'canvas':
+          ((container as unknown) as CanvasLayerContainer).removeLayer(layer.draw);
+          break;
+      }
       return;
     }
-    // TODO remove layer from container
-    // and remove container if not needed anymore
-    // and merge neighboring containers if possible
+
+    container.remove();
+    const containerIndex = this.containers.indexOf(container);
+    this.containers.splice(containerIndex, 1);
+    this.mergeContainers(containerIndex);
+    return true;
+  }
+
+  private mergeContainers(nextIndex: number) {
+    // merge test
+    if (nextIndex === 0 || nextIndex === this.containers.length || this.containers.length === 1) {
+      return;
+    }
+    const previous = this.containers[nextIndex - 1];
+    const next = this.containers[nextIndex];
+
+    if (previous instanceof CanvasLayerContainer && next instanceof CanvasLayerContainer) {
+      for (const l of next.layers) {
+        previous.pushLayer(l.render, l.draw);
+      }
+    } else if (
+      (previous instanceof HTMLLayerContainer && next instanceof HTMLLayerContainer) ||
+      (previous instanceof SVGLayerContainer && next instanceof SVGLayerContainer)
+    ) {
+      for (const l of Array.from(next.root.children)) {
+        previous.root.appendChild(l);
+      }
+    } else {
+      return;
+    }
+    this.containers.splice(nextIndex, 1);
+    return;
+  }
+
+  private splitContainers(index: number, layerIndex: number) {
+    const container = this.containers[index];
+
+    if (container instanceof CanvasLayerContainer) {
+      const previous = new CanvasLayerContainer(this.document);
+      previous.layers.push(...container.layers.splice(0, layerIndex));
+      this.containers.splice(index, 0, previous);
+    } else if (container instanceof HTMLLayerContainer || container instanceof SVGLayerContainer) {
+      const previous = new HTMLLayerContainer(this.document);
+      for (const child of Array.from(container.root.children).slice(0, layerIndex).reverse()) {
+        previous.root.appendChild(child);
+      }
+      this.containers.splice(index, 0, previous);
+    }
   }
 
   private move(layer: IContainerLayer, delta: number) {
@@ -183,7 +267,7 @@ export default class LayersPlugin {
 
   private initLayer(l: Partial<IContainerLayer>): IContainerLayer {
     let that = this;
-    return {
+    const r: any = {
       moveUp() {
         return that.move(this, -1);
       },
@@ -196,21 +280,22 @@ export default class LayersPlugin {
       moveFront() {
         return that.move(this, Number.POSITIVE_INFINITY);
       },
-      insertBefore(type, render) {
-        return that.insertBefore(this, type, render);
+      insertBefore(type: 'svg' | 'canvas' | 'html', render?: (ctx: CanvasRenderingContext2D) => void) {
+        return that.insertBefore(this, type as any, render!) as any;
       },
-      insertAfter(type, render) {
-        return that.insertAfter(this, type, render);
+      insertAfter(type: 'svg' | 'canvas' | 'html', render?: (ctx: CanvasRenderingContext2D) => void) {
+        return that.insertAfter(this, type as any, render!);
       },
       remove() {
         return that.removeLayer(this);
       },
       ...l,
     };
+    return r;
   }
 
   private appendSVG() {
-    const last = this.getLastLayer();
+    const last = this.getLast();
     let container: SVGLayerContainer | null = null;
     if (last && last.container instanceof SVGLayerContainer) {
       container = last.container;
@@ -220,7 +305,7 @@ export default class LayersPlugin {
       this.initContainer(container);
     }
     const node = container.createLayer();
-    container.node.appendChild(node);
+    container.root.appendChild(node);
     const layer = this.initLayer({
       type: 'svg',
       node,
@@ -231,7 +316,7 @@ export default class LayersPlugin {
   }
 
   private appendHTML() {
-    const last = this.getLastLayer();
+    const last = this.getLast();
     let container: HTMLLayerContainer | null = null;
     if (last && last.container instanceof HTMLLayerContainer) {
       container = last.container;
@@ -252,7 +337,7 @@ export default class LayersPlugin {
   }
 
   private appendCanvas(render: (ctx: CanvasRenderingContext2D) => void) {
-    const last = this.getLastLayer();
+    const last = this.getLast();
     let container: CanvasLayerContainer | null = null;
     if (last && last.container instanceof CanvasLayerContainer) {
       container = last.container;
@@ -261,10 +346,10 @@ export default class LayersPlugin {
       container = new CanvasLayerContainer(this.cy.container()!.ownerDocument);
       this.initContainer(container);
     }
-    container.pushLayer(render);
+    const draw = container.pushLayer(render);
     const layer = this.initLayer({
       type: 'canvas',
-      render,
+      draw,
       container,
     });
     this.layers.push(layer);
