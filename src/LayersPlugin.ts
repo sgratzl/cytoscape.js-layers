@@ -3,12 +3,23 @@ import { ILayerContainer } from './layers';
 
 export interface ILayersPluginOptions {}
 
+export const NODE_LAYER = 10;
+export const DRAG_LAYER = 20;
+export const SELECT_BOX_LAYER = 30;
+
 export default class LayersPlugin {
   readonly cy: cy.Core;
-  private containers: ILayerContainer[] = [];
+  private readonly containers: ILayerContainer[] = [];
 
   constructor(cy: cy.Core) {
     this.cy = cy;
+
+    const container = cy.container()!;
+
+    // change z-indices to have more space between
+    for (const layer of Array.from(container.querySelectorAll<HTMLElement>('[data-id^=layer]'))) {
+      layer.style.zIndex = `${layer.style.zIndex}0`;
+    }
 
     cy.on('viewport', this.zoomed);
     cy.on('resize', this.resize);
@@ -31,6 +42,7 @@ export default class LayersPlugin {
     this.cy.off('destroy', undefined, this.destroy);
     this.cy.off('viewport', undefined, this.zoomed);
     this.cy.off('resize', undefined, this.resize);
+    this.cy.scratch('_layers', undefined);
   };
 
   private readonly zoomed = () => {
@@ -50,6 +62,9 @@ export default class LayersPlugin {
 }
 
 export function layers(this: cy.Core) {
+  if (!this.container()) {
+    throw new Error('layers plugin does not work in headless environments');
+  }
   // ensure just one instance exists
   const singleton = this.scratch('_layers') as LayersPlugin;
   if (singleton) {
