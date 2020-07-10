@@ -1,0 +1,4 @@
+packageExtensions:
+  'tsdx@*':
+    dependencies:
+      'babel-jest': '^25.5.1'

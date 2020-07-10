@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>ESM Sample</title>
+    <style>
+      #app {
+        width: 600px;
+        height: 400px;
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script defer src="https://cdn.jsdelivr.net/npm/es-module-shims"></script>
+    <script type="importmap-shim">
+      {
+        "imports": {
+          "cytoscape": "https://cdn.jsdelivr.net/npm/cytoscape@3.15.0/dist/cytoscape.esm.min.js",
+          "cytoscape-layers": "../dist/cytoscapelayers.esm.js"
+        }
+      }
+    </script>
+    <script type="module-shim">
+      import cytoscape from 'cytoscape';
+      import BubbleSets from 'cytoscape-layers';
+      cytoscape.use(BubbleSets);
+
+      const cy = cytoscape({
+        container: document.getElementById('app'),
+        elements: [
+          { data: { id: 'a' } },
+          { data: { id: 'b' } },
+          {
+            data: {
+              id: 'ab',
+              source: 'a',
+              target: 'b',
+            },
+          },
+        ],
+      });
+      cy.ready(() => {
+        const bb = cy.bubbleSets();
+        bb.addPath(cy.nodes(), cy.edges(), null);
+      });
+    </script>
+  </body>
+</html>
