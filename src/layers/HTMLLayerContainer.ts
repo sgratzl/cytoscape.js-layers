@@ -1,7 +1,7 @@
 import { ILayerContainer } from './interfaces';
 import { layerStyle } from './utils';
 
-export class DOMLayerContainer implements ILayerContainer {
+export class HTMLLayerContainer implements ILayerContainer {
   readonly node: HTMLDivElement;
 
   constructor(doc: Document) {
@@ -24,5 +24,9 @@ export class DOMLayerContainer implements ILayerContainer {
 
   update() {
     // dummy
+  }
+
+  createLayer() {
+    return this.node.ownerDocument.createElement('div');
   }
 }

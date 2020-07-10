@@ -27,8 +27,8 @@ export class SVGLayerContainer implements ILayerContainer {
     this.node.remove();
   }
 
-  pushLayer() {
-    this.node.firstElementChild! as SVGGElement;
+  createLayer() {
+    return this.root.ownerDocument.createElementNS(SVGLayerContainer.NS, 'g');
   }
 
   update() {

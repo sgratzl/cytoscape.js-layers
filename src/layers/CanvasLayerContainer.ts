@@ -5,6 +5,7 @@ export class CanvasLayerContainer implements ILayerContainer {
   readonly node: HTMLCanvasElement;
   readonly ctx: CanvasRenderingContext2D;
   private readonly pixelRatio: number;
+  private readonly layers: ((ctx: CanvasRenderingContext2D) => void)[] = [];
 
   constructor(doc: Document, options: Partial<CanvasRenderingContext2DSettings & { pixelRatio: number }> = {}) {
     this.node = doc.createElement('canvas');
@@ -43,5 +44,9 @@ export class CanvasLayerContainer implements ILayerContainer {
 
   remove() {
     this.node.remove();
+  }
+
+  pushLayer(render: (ctx: CanvasRenderingContext2D) => void) {
+    this.layers.push(render);
   }
 }
