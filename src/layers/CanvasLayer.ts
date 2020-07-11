@@ -7,6 +7,11 @@ export class CanvasBaseLayer extends ABaseLayer implements ILayerImpl {
   readonly ctx: CanvasRenderingContext2D;
   protected readonly pixelRatio: number;
   readonly callbacks: IRenderFunction[] = [];
+  protected readonly transform: { tx: number; ty: number; zoom: number } = {
+    tx: 0,
+    ty: 0,
+    zoom: 1,
+  };
 
   constructor(
     adapter: ILayerAdapter,
@@ -18,6 +23,7 @@ export class CanvasBaseLayer extends ABaseLayer implements ILayerImpl {
     Object.assign(this.node.style, layerStyle);
     this.pixelRatio = options.pixelRatio ?? (window ?? {}).devicePixelRatio ?? 1;
     this.ctx = this.node.getContext('2d', options)!;
+    this.ctx.resetTransform();
   }
 
   get root() {
@@ -43,6 +49,10 @@ export class CanvasBaseLayer extends ABaseLayer implements ILayerImpl {
   draw() {
     this.clear();
     this.ctx.save();
+    this.ctx.resetTransform();
+    this.ctx.scale(this.pixelRatio, this.pixelRatio);
+    this.ctx.translate(this.transform.tx, this.transform.ty);
+    this.ctx.scale(this.transform.zoom, this.transform.zoom);
 
     for (const r of this.callbacks) {
       r(this.ctx);
@@ -78,10 +88,10 @@ export class CanvasLayer extends CanvasBaseLayer implements ICanvasLayer {
   }
 
   setViewport(tx: number, ty: number, zoom: number) {
-    this.ctx.resetTransform();
-    this.ctx.scale(this.pixelRatio, this.pixelRatio);
-    this.ctx.translate(tx, ty);
-    this.ctx.scale(zoom, zoom);
+    this.transform.tx = tx;
+    this.transform.ty = ty;
+    this.transform.zoom = zoom;
+    this.update();
   }
 }
 

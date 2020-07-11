@@ -7,13 +7,14 @@ export const SVG_NS = 'http://www.w3.org/2000/svg';
 export class SVGLayer extends ABaseLayer implements ISVGLayer, ILayerImpl {
   readonly type = 'svg';
   readonly node: SVGGElement & ILayerElement;
-  readonly root: SVGSVGElement;
+  readonly root: SVGSVGElement & ILayerElement;
   readonly callbacks: ISVGNodeUpdateFunction[] = [];
 
   constructor(adapter: ILayerAdapter, doc: Document) {
     super(adapter);
     this.root = (doc.createElementNS(SVG_NS, 'svg') as unknown) as SVGSVGElement & ILayerElement;
     Object.assign(this.root.style, layerStyle);
+    this.root.__cy_layer = this;
     this.node = (doc.createElementNS(SVG_NS, 'g') as unknown) as SVGGElement & ILayerElement;
     this.node.__cy_layer = this;
     this.root.appendChild(this.node);

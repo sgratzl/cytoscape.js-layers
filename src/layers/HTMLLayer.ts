@@ -5,16 +5,20 @@ import { layerStyle } from './utils';
 export class HTMLLayer extends ABaseLayer implements IHTMLLayer, ILayerImpl {
   readonly type = 'html';
   readonly node: HTMLDivElement & ILayerElement;
-  readonly root: HTMLElement;
+  readonly root: HTMLElement & ILayerElement;
   readonly callbacks: INodeUpdateFunction[] = [];
 
   constructor(adapter: ILayerAdapter, doc: Document) {
     super(adapter);
-    this.root = doc.createElement('div');
+    this.root = (doc.createElement('div') as unknown) as HTMLDivElement & ILayerElement;
     Object.assign(this.root.style, layerStyle);
+    this.root.__cy_layer = this;
     this.root.style.overflow = 'hidden';
     this.node = (doc.createElement('div') as unknown) as HTMLDivElement & ILayerElement;
     this.node.__cy_layer = this;
+    this.node.style.position = 'absolute';
+    this.node.style.left = '0px';
+    this.node.style.top = '0px';
     this.root.appendChild(this.node);
   }
 

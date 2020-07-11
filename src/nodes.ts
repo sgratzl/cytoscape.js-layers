@@ -52,7 +52,7 @@ export function renderPerNode(
       const t = ctx.getTransform();
       (nodes || layer.cy.nodes(o.selector)).forEach((node) => {
         const bb = node.boundingBox(o.boundingBox);
-        ctx.translate(bb.x1, bb.x2);
+        ctx.translate(bb.x1, bb.y1);
         render(ctx, node, bb);
         ctx.setTransform(t);
       });
