@@ -5,20 +5,24 @@ import { matchNodes, registerCallback, ICallbackRemover } from './utils';
 
 export interface INodeLayerOption {
   selector: string;
-  updateOnRender: boolean;
+  updateOn: 'render' | 'position' | 'auto';
   queryEachTime: boolean;
   boundingBox: cy.BoundingBoxOptions;
 }
 
 const defaultOptions: INodeLayerOption = {
   selector: ':visible',
-  updateOnRender: true,
+  updateOn: 'auto',
   queryEachTime: false,
   boundingBox: {
     includeLabels: false,
     includeOverlays: false,
   },
 };
+
+export interface IRenderPerNodeResult extends ICallbackRemover {
+  nodes: cy.NodeCollection;
+}
 
 export function renderPerNode(
   layer: ICanvasLayer,
@@ -41,23 +45,37 @@ export function renderPerNode(
   options: Partial<INodeLayerOption> = {}
 ): ICallbackRemover {
   const o = Object.assign({}, defaultOptions, options);
-  const nodes = o.queryEachTime ? null : layer.cy.nodes(o.selector);
+  const nodes = o.queryEachTime ? layer.cy.collection() : layer.cy.nodes(o.selector);
 
-  if (o.updateOnRender) {
+  const autoRender = o.updateOn === 'auto' ? (o.queryEachTime ? 'render' : 'position') : o.updateOn;
+  if (autoRender === 'render') {
     layer.updateOnRender = true;
+  } else if (autoRender === 'position') {
+    nodes.on('position add remove', layer.update);
+  } else {
+    nodes.on('add remove', layer.update);
   }
+
+  const re = (v: ICallbackRemover) => ({
+    nodes,
+    remove: () => {
+      nodes.off('position add remove', undefined, layer.update);
+      v.remove();
+    },
+  });
 
   if (layer.type === 'canvas') {
     const renderer = (ctx: CanvasRenderingContext2D) => {
       const t = ctx.getTransform();
-      (nodes || layer.cy.nodes(o.selector)).forEach((node) => {
+      const currentNodes = o.queryEachTime ? layer.cy.nodes(o.selector) : nodes;
+      currentNodes.forEach((node) => {
         const bb = node.boundingBox(o.boundingBox);
         ctx.translate(bb.x1, bb.y1);
         render(ctx, node, bb);
         ctx.setTransform(t);
       });
     };
-    return registerCallback(layer, renderer);
+    return re(registerCallback(layer, renderer));
   }
 
   if (layer.type === 'html') {
@@ -66,11 +84,11 @@ export function renderPerNode(
       r.style.position = 'absolute';
       return r;
     };
-    if (nodes) {
+    if (!o.queryEachTime) {
       matchNodes(layer.node, nodes, factory);
     }
     const renderer = (root: HTMLElement) => {
-      const currentNodes = nodes || layer.cy.nodes(o.selector);
+      const currentNodes = o.queryEachTime ? layer.cy.nodes(o.selector) : nodes;
       if (o.queryEachTime) {
         matchNodes(root, currentNodes, factory);
       }
@@ -81,16 +99,16 @@ export function renderPerNode(
         render(elem, node, bb);
       });
     };
-    return registerCallback(layer, renderer);
+    return re(registerCallback(layer, renderer));
   }
 
   // if (layer.type === 'svg') {
   const factory = () => layer.node.ownerDocument.createElementNS(SVG_NS, 'g');
-  if (nodes) {
+  if (!o.queryEachTime) {
     matchNodes(layer.node, nodes, factory);
   }
   const renderer = (root: SVGElement) => {
-    const currentNodes = nodes || layer.cy.nodes(o.selector);
+    const currentNodes = o.queryEachTime ? layer.cy.nodes(o.selector) : nodes;
     if (o.queryEachTime) {
       matchNodes(root, currentNodes, factory);
     }
@@ -101,5 +119,5 @@ export function renderPerNode(
       render(elem, node, bb);
     });
   };
-  return registerCallback(layer, renderer);
+  return re(registerCallback(layer, renderer));
 }

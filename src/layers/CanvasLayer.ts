@@ -64,6 +64,7 @@ export class CanvasBaseLayer extends ABaseLayer implements ILayerImpl {
   resize(width: number, height: number) {
     this.node.width = width * this.pixelRatio;
     this.node.height = height * this.pixelRatio;
+    this.update();
   }
 
   setViewport(_tx: number, _ty: number, _zoom: number) {
