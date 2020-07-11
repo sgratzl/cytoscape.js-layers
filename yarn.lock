@@ -3633,8 +3633,7 @@ __metadata:
     eslint-plugin-jsx-a11y: ^6.3.1
     eslint-plugin-prettier: ^3.1.4
     eslint-plugin-react: ^7.20.3
-    eslint-plugin-react-hooks: ^4.0.6
-    lodash.throttle: ^4.1.1
+    eslint-plugin-react-hooks: ^4.0.7
     prettier: ^2.0.5
     release-it: ^13.6.5
     rimraf: ^3.0.2
@@ -4241,12 +4240,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-react-hooks@npm:^4.0.6":
-  version: 4.0.6
-  resolution: "eslint-plugin-react-hooks@npm:4.0.6"
+"eslint-plugin-react-hooks@npm:^4.0.7":
+  version: 4.0.7
+  resolution: "eslint-plugin-react-hooks@npm:4.0.7"
   peerDependencies:
     eslint: ^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0
-  checksum: bd240d6e1a82884c9386e190dc3a7157bcfdb660543624bf57d73261cc47c8814e6cc5f5886eaad4e414d7138602a08dcc08eacee8a3b8cfba2418280c8a3a60
+  checksum: ecf5f24ac7a485ecd7417f93e3c00e124d6bf43e78beb9aecdaa7bae1d9d4871de5bc190d4a5d6e46a55ddfe7f1135794666afbdf79c35f695e8931e863c880f
   languageName: node
   linkType: hard
 
@@ -6972,13 +6971,6 @@ fsevents@^1.2.7:
   version: 4.7.0
   resolution: "lodash.sortby@npm:4.7.0"
   checksum: 43cde11276c66da7b3eda5e9f00dc6edc276d2bcf0a5969ffc62b612cd1c4baf2eff5e84cee11383005722c460a9ca0f521fad4fa1cd2dc1ef013ee4da2dfe63
-  languageName: node
-  linkType: hard
-
-"lodash.throttle@npm:^4.1.1":
-  version: 4.1.1
-  resolution: "lodash.throttle@npm:4.1.1"
-  checksum: d9107c79033f609f23552f48f5ba93b8a98a07a2b38914745a48d33f18704a4c6a125610ad2bab2a0139974d1da7c5d6a24271243e21571f01e21bf3b2f6b21d
   languageName: node
   linkType: hard
 
