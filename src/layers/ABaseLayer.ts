@@ -1,8 +1,21 @@
-import { ICanvasLayer, IHTMLLayer, IMoveAbleLayer, ISVGLayer, ILayer, IRenderFunction } from './interfaces';
+import {
+  ICanvasLayer,
+  IHTMLLayer,
+  IMoveAbleLayer,
+  ISVGLayer,
+  ILayer,
+  IRenderFunction,
+  IHTMLStaticLayer,
+  ISVGStaticLayer,
+} from './interfaces';
 
 export interface ILayerAdapter {
   move(layer: IMoveAbleLayer, offset: number): void;
-  insert(where: 'before' | 'after', layer: IMoveAbleLayer, type: 'svg' | 'html' | IRenderFunction): ILayer;
+  insert(
+    where: 'before' | 'after',
+    layer: IMoveAbleLayer,
+    type: 'svg' | 'html' | IRenderFunction | 'svg-static' | 'html-static'
+  ): ILayer;
 }
 
 export class ABaseLayer implements IMoveAbleLayer {
@@ -22,16 +35,20 @@ export class ABaseLayer implements IMoveAbleLayer {
   }
 
   insertBefore(type: 'svg'): ISVGLayer;
+  insertBefore(type: 'svg-static'): ISVGStaticLayer;
   insertBefore(type: IRenderFunction): ICanvasLayer;
   insertBefore(type: 'html'): IHTMLLayer;
-  insertBefore(type: 'svg' | 'html' | IRenderFunction) {
+  insertBefore(type: 'html-static'): IHTMLStaticLayer;
+  insertBefore(type: 'svg' | 'html' | IRenderFunction | 'svg-static' | 'html-static') {
     return this.adapter.insert('before', this, type);
   }
 
   insertAfter(type: 'svg'): ISVGLayer;
+  insertAfter(type: 'svg-static'): ISVGStaticLayer;
   insertAfter(type: IRenderFunction): ICanvasLayer;
   insertAfter(type: 'html'): IHTMLLayer;
-  insertAfter(type: 'svg' | 'html' | IRenderFunction) {
+  insertAfter(type: 'html-static'): IHTMLStaticLayer;
+  insertAfter(type: 'svg' | 'html' | IRenderFunction | 'svg-static' | 'html-static') {
     return this.adapter.insert('after', this, type);
   }
 }

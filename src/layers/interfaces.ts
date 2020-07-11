@@ -2,19 +2,22 @@ export interface IRenderFunction {
   (ctx: CanvasRenderingContext2D): void;
 }
 
+export interface ILayerDescFunction {
+  (type: 'svg'): ISVGLayer;
+  (type: 'svg-static'): ISVGStaticLayer;
+  (type: IRenderFunction): ICanvasLayer;
+  (type: 'html'): IHTMLLayer;
+  (type: 'html-static'): IHTMLStaticLayer;
+}
+
 export interface IMoveAbleLayer {
   moveUp(): void;
   moveDown(): void;
   moveBack(): void;
   moveFront(): void;
 
-  insertBefore(type: 'svg'): ISVGLayer;
-  insertBefore(type: IRenderFunction): ICanvasLayer;
-  insertBefore(type: 'html'): IHTMLLayer;
-
-  insertAfter(type: 'svg'): ISVGLayer;
-  insertAfter(type: IRenderFunction): ICanvasLayer;
-  insertAfter(type: 'html'): IHTMLLayer;
+  insertBefore: ILayerDescFunction;
+  insertAfter: ILayerDescFunction;
 }
 
 export interface ICustomLayer extends IMoveAbleLayer {
@@ -23,7 +26,12 @@ export interface ICustomLayer extends IMoveAbleLayer {
 
 export interface ISVGLayer extends ICustomLayer {
   readonly type: 'svg';
-  readonly node: SVGGElement;
+  readonly node: SVGElement;
+}
+
+export interface ISVGStaticLayer extends ICustomLayer {
+  readonly type: 'svg-static';
+  readonly node: SVGElement;
 }
 
 export interface ICanvasLayer extends ICustomLayer {
@@ -33,6 +41,11 @@ export interface ICanvasLayer extends ICustomLayer {
 
 export interface IHTMLLayer extends ICustomLayer {
   readonly type: 'html';
+  readonly node: HTMLElement;
+}
+
+export interface IHTMLStaticLayer extends ICustomLayer {
+  readonly type: 'html-static';
   readonly node: HTMLElement;
 }
 
@@ -54,7 +67,9 @@ export type ILayer =
   | ICytoscapeDragLayer
   | ICytoscapeSelectBoxLayer
   | IHTMLLayer
+  | IHTMLStaticLayer
   | ISVGLayer
+  | ISVGStaticLayer
   | ICanvasLayer;
 
 export interface ILayerElement {

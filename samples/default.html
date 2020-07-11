@@ -30,8 +30,8 @@
         ],
       });
       const layers = cy.layers();
-      layers.append('svg').node.innerHTML = `<text>TEST</text>`;
-      cy.ready(() => {});
+      layers.append('svg-static').node.innerHTML = `<text>TEST</text>`;
+      layers.nodeLayer.insertAfter('html-static').node.innerHTML = 'TEST2';
     </script>
   </body>
 </html>
