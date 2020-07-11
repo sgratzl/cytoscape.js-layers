@@ -2,7 +2,7 @@
 
 [![NPM Package][npm-image]][npm-url] [![Github Actions][github-actions-image]][github-actions-url] [![Cytoscape Plugin][cytoscape-image]][cytoscape-url]
 
-A [Cytoscape.js](https://js.cytoscape.org) plugin for rendering TODO
+A [Cytoscape.js](https://js.cytoscape.org) plugin for easy rendering of different layers in SVG, HTML, or Canvas format.
 
 ## Install
 
@@ -12,7 +12,7 @@ npm install cytoscape cytoscape-layers
 
 ## Usage
 
-see [Samples](https://github.com/sgratzl/cytoscape-layers/tree/master/samples) on Github
+see [Samples](./samples) on Github
 
 or at this [![Open in CodePen][codepen]](https://codepen.io/sgratzl/pen/TODO)
 
@@ -35,8 +35,19 @@ const cy = cytoscape({
     },
   ],
 });
-cy.ready(() => {
-  // TODO
+const layers = cy.layers();
+layers.nodeLayer.insertAfter('html-static').node.innerHTML = 'Static Test Label';
+
+layers.renderPerNode(layers.append('canvas'), (ctx, node, bb) => {
+  ctx.strokeStyle = 'red';
+  ctx.strokeRect(0, 0, bb.w, bb.h);
+});
+layers.renderPerNode(layers.append('html'), (elem, node) => {
+  elem.textContent = node.id();
+});
+layers.renderPerEdge(layers.append('canvas'), (ctx, edge, path) => {
+  ctx.strokeStyle = 'red';
+  ctx.stroke(path);
 });
 ```
 
