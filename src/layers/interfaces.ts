@@ -1,12 +1,5 @@
-export interface ILayerContainer {
-  readonly node: HTMLDivElement | SVGSVGElement | HTMLCanvasElement;
-  resize(width: number, height: number): void;
-  remove(): void;
-  setViewport(tx: number, ty: number, zoom: number): void;
-
-  indexOf(layer: ILayer): number;
-
-  length: number;
+export interface IRenderFunction {
+  (ctx: CanvasRenderingContext2D): void;
 }
 
 export interface IMoveAbleLayer {
@@ -16,11 +9,11 @@ export interface IMoveAbleLayer {
   moveFront(): void;
 
   insertBefore(type: 'svg'): ISVGLayer;
-  insertBefore(type: 'canvas', render: (ctx: CanvasRenderingContext2D) => void): ICanvasLayer;
+  insertBefore(type: IRenderFunction): ICanvasLayer;
   insertBefore(type: 'html'): IHTMLLayer;
 
   insertAfter(type: 'svg'): ISVGLayer;
-  insertAfter(type: 'canvas', render: (ctx: CanvasRenderingContext2D) => void): ICanvasLayer;
+  insertAfter(type: IRenderFunction): ICanvasLayer;
   insertAfter(type: 'html'): IHTMLLayer;
 }
 
@@ -29,31 +22,31 @@ export interface ICustomLayer extends IMoveAbleLayer {
 }
 
 export interface ISVGLayer extends ICustomLayer {
-  type: 'svg';
-  node: SVGGElement;
+  readonly type: 'svg';
+  readonly node: SVGGElement;
 }
 
 export interface ICanvasLayer extends ICustomLayer {
-  type: 'canvas';
+  readonly type: 'canvas';
   draw(): void;
 }
 
 export interface IHTMLLayer extends ICustomLayer {
-  type: 'html';
-  node: HTMLElement;
+  readonly type: 'html';
+  readonly node: HTMLElement;
 }
 
 export interface ICytoscapeNodeLayer extends IMoveAbleLayer {
-  node: HTMLCanvasElement;
-  type: 'node';
+  readonly node: HTMLCanvasElement;
+  readonly type: 'node';
 }
 export interface ICytoscapeDragLayer extends IMoveAbleLayer {
-  node: HTMLCanvasElement;
-  type: 'drag';
+  readonly node: HTMLCanvasElement;
+  readonly type: 'drag';
 }
 export interface ICytoscapeSelectBoxLayer extends IMoveAbleLayer {
-  node: HTMLCanvasElement;
-  type: 'select-box';
+  readonly node: HTMLCanvasElement;
+  readonly type: 'select-box';
 }
 
 export type ILayer =
@@ -64,6 +57,13 @@ export type ILayer =
   | ISVGLayer
   | ICanvasLayer;
 
-export type IContainerLayer = ILayer & {
-  container?: ILayerContainer;
-};
+export interface ILayerElement {
+  __cy_layer: ILayer & ILayerImpl;
+}
+
+export interface ILayerImpl {
+  readonly root: HTMLElement | SVGSVGElement;
+  resize(width: number, height: number): void;
+  remove(): void;
+  setViewport(tx: number, ty: number, zoom: number): void;
+}
