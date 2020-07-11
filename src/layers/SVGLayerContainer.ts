@@ -1,4 +1,4 @@
-import { ILayerContainer, ILayer } from './interfaces';
+import { ILayerContainer, ILayer, ISVGLayer } from './interfaces';
 import { layerStyle } from './utils';
 
 export class SVGLayerContainer implements ILayerContainer {
@@ -40,5 +40,19 @@ export class SVGLayerContainer implements ILayerContainer {
 
   createLayer() {
     return this.root.ownerDocument.createElementNS(SVGLayerContainer.NS, 'g');
+  }
+
+  layer(where: 'before' | 'after', ref: ILayer | null) {
+    const node = this.createLayer();
+    if (ref) {
+      (ref as ISVGLayer).node.insertAdjacentElement(where === 'before' ? 'beforebegin' : 'afterend', node);
+    } else {
+      this.root.insertAdjacentElement(where === 'before' ? 'afterbegin' : 'beforeend', node);
+    }
+    return {
+      type: 'svg' as 'svg',
+      node,
+      container: this,
+    };
   }
 }

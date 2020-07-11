@@ -1,4 +1,4 @@
-import { ILayerContainer, ILayer } from './interfaces';
+import { ILayerContainer, ILayer, ICanvasLayer } from './interfaces';
 import { layerStyle } from './utils';
 
 export class CanvasLayerContainer implements ILayerContainer {
@@ -71,5 +71,27 @@ export class CanvasLayerContainer implements ILayerContainer {
       return;
     }
     this.layers.splice(index, 1);
+  }
+
+  layer(
+    where: 'before' | 'after',
+    ref: ILayer | null,
+    render: (ctx: CanvasRenderingContext2D) => void,
+    draw = () => this.draw()
+  ) {
+    const l = { draw, render };
+    if (ref) {
+      const index = this.layers.findIndex((d) => d.draw === (ref as ICanvasLayer).draw);
+      this.layers.splice(where === 'before' ? index : index + 1, 0, l);
+    } else if (where === 'before') {
+      this.layers.unshift(l);
+    } else {
+      this.layers.push(l);
+    }
+    return {
+      type: 'canvas' as 'canvas',
+      draw,
+      container: this,
+    };
   }
 }

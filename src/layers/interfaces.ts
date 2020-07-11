@@ -9,26 +9,19 @@ export interface ILayerContainer {
   length: number;
 }
 
-export interface ILayerFunction {
-  (type: 'svg'): ISVGLayer;
-  (type: 'canvas', render: (ctx: CanvasRenderingContext2D) => void): ICanvasLayer;
-  (type: 'html'): IHTMLLayer;
-}
-
-export interface IRelativeLayerFunction {
-  (layer: ILayer, type: 'svg'): ISVGLayer;
-  (layer: ILayer, type: 'canvas', render: (ctx: CanvasRenderingContext2D) => void): ICanvasLayer;
-  (layer: ILayer, type: 'html'): IHTMLLayer;
-}
-
 export interface IMoveAbleLayer {
   moveUp(): void;
   moveDown(): void;
   moveBack(): void;
   moveFront(): void;
 
-  insertBefore: ILayerFunction;
-  insertAfter: ILayerFunction;
+  insertBefore(type: 'svg'): ISVGLayer;
+  insertBefore(type: 'canvas', render: (ctx: CanvasRenderingContext2D) => void): ICanvasLayer;
+  insertBefore(type: 'html'): IHTMLLayer;
+
+  insertAfter(type: 'svg'): ISVGLayer;
+  insertAfter(type: 'canvas', render: (ctx: CanvasRenderingContext2D) => void): ICanvasLayer;
+  insertAfter(type: 'html'): IHTMLLayer;
 }
 
 export interface ICustomLayer extends IMoveAbleLayer {
@@ -72,5 +65,5 @@ export type ILayer =
   | ICanvasLayer;
 
 export type IContainerLayer = ILayer & {
-  container: ILayerContainer | null;
+  container?: ILayerContainer;
 };

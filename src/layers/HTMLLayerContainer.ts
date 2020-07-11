@@ -1,4 +1,4 @@
-import { ILayerContainer, ILayer } from './interfaces';
+import { ILayerContainer, ILayer, IHTMLLayer } from './interfaces';
 import { layerStyle } from './utils';
 
 export class HTMLLayerContainer implements ILayerContainer {
@@ -37,8 +37,21 @@ export class HTMLLayerContainer implements ILayerContainer {
     this.node.remove();
   }
 
-
   createLayer() {
     return this.node.ownerDocument.createElement('div');
+  }
+
+  layer(where: 'before' | 'after', ref: ILayer | null) {
+    const node = this.createLayer();
+    if (ref) {
+      (ref as IHTMLLayer).node.insertAdjacentElement(where === 'before' ? 'beforebegin' : 'afterend', node);
+    } else {
+      this.root.insertAdjacentElement(where === 'before' ? 'afterbegin' : 'beforeend', node);
+    }
+    return {
+      type: 'html' as 'html',
+      node,
+      container: this,
+    };
   }
 }
