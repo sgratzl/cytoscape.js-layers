@@ -19,6 +19,8 @@ export class CytoscapeBaseLayer extends ABaseLayer implements ILayerImpl {
     return this.node;
   }
 
+  readonly update = () => {};
+
   resize() {}
 
   setViewport() {}

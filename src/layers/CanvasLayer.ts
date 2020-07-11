@@ -1,22 +1,20 @@
-import { ICanvasLayer, ILayerElement, ILayerImpl, IRenderFunction } from './interfaces';
+import { ICanvasLayer, ILayerElement, ILayerImpl, IRenderFunction, ICanvasStaticLayer } from './interfaces';
 import { layerStyle } from './utils';
 import { ABaseLayer, ILayerAdapter } from './ABaseLayer';
 
-export class CanvasLayer extends ABaseLayer implements ICanvasLayer, ILayerImpl {
-  readonly type = 'canvas';
+export class CanvasBaseLayer extends ABaseLayer implements ILayerImpl {
   readonly node: HTMLCanvasElement & ILayerElement;
   readonly ctx: CanvasRenderingContext2D;
-  private readonly pixelRatio: number;
+  protected readonly pixelRatio: number;
+  readonly callbacks: IRenderFunction[] = [];
 
   constructor(
     adapter: ILayerAdapter,
     doc: Document,
-    private readonly render: IRenderFunction,
     options: Partial<CanvasRenderingContext2DSettings & { pixelRatio: number }> = {}
   ) {
     super(adapter);
     this.node = (doc.createElement('canvas') as unknown) as HTMLCanvasElement & ILayerElement;
-    this.node.__cy_layer = this;
     Object.assign(this.node.style, layerStyle);
     this.pixelRatio = options.pixelRatio ?? (window ?? {}).devicePixelRatio ?? 1;
     this.ctx = this.node.getContext('2d', options)!;
@@ -26,6 +24,14 @@ export class CanvasLayer extends ABaseLayer implements ICanvasLayer, ILayerImpl 
     return this.node;
   }
 
+  callback(callback: IRenderFunction) {
+    this.callbacks.push(callback);
+    this.update();
+    return this;
+  }
+
+  readonly update = () => this.draw();
+
   clear() {
     const ctx = this.ctx;
     const bak = ctx.getTransform();
@@ -34,18 +40,41 @@ export class CanvasLayer extends ABaseLayer implements ICanvasLayer, ILayerImpl 
     ctx.setTransform(bak);
   }
 
-  readonly draw = () => {
+  draw() {
     this.clear();
     this.ctx.save();
 
-    this.render(this.ctx);
+    for (const r of this.callbacks) {
+      r(this.ctx);
+    }
 
     this.ctx.restore();
-  };
+  }
 
   resize(width: number, height: number) {
     this.node.width = width * this.pixelRatio;
     this.node.height = height * this.pixelRatio;
+  }
+
+  setViewport(_tx: number, _ty: number, _zoom: number) {
+    // dummy
+  }
+
+  remove() {
+    this.node.remove();
+  }
+}
+
+export class CanvasLayer extends CanvasBaseLayer implements ICanvasLayer {
+  readonly type = 'canvas';
+
+  constructor(
+    adapter: ILayerAdapter,
+    doc: Document,
+    options: Partial<CanvasRenderingContext2DSettings & { pixelRatio: number }> = {}
+  ) {
+    super(adapter, doc, options);
+    this.node.__cy_layer = this;
   }
 
   setViewport(tx: number, ty: number, zoom: number) {
@@ -54,8 +83,17 @@ export class CanvasLayer extends ABaseLayer implements ICanvasLayer, ILayerImpl 
     this.ctx.translate(tx, ty);
     this.ctx.scale(zoom, zoom);
   }
+}
 
-  remove() {
-    this.node.remove();
+export class CanvasStaticLayer extends CanvasBaseLayer implements ICanvasStaticLayer {
+  readonly type = 'canvas-static';
+
+  constructor(
+    adapter: ILayerAdapter,
+    doc: Document,
+    options: Partial<CanvasRenderingContext2DSettings & { pixelRatio: number }> = {}
+  ) {
+    super(adapter, doc, options);
+    this.node.__cy_layer = this;
   }
 }

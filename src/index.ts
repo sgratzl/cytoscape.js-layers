@@ -1,6 +1,8 @@
 import { layers } from './LayersPlugin';
 export * from './LayersPlugin';
 export { default as LayersPlugin } from './LayersPlugin';
+export * from './nodes';
+export * from './edges';
 
 export default function register(
   cytoscape: (type: 'core' | 'collection' | 'layout', name: string, extension: any) => void

@@ -1,11 +1,12 @@
 import { ABaseLayer, ILayerAdapter } from './ABaseLayer';
-import { IHTMLLayer, ILayerElement, ILayerImpl, IHTMLStaticLayer } from './interfaces';
+import { IHTMLLayer, ILayerElement, ILayerImpl, IHTMLStaticLayer, INodeUpdateFunction } from './interfaces';
 import { layerStyle } from './utils';
 
 export class HTMLLayer extends ABaseLayer implements IHTMLLayer, ILayerImpl {
   readonly type = 'html';
   readonly node: HTMLDivElement & ILayerElement;
   readonly root: HTMLElement;
+  readonly callbacks: INodeUpdateFunction[] = [];
 
   constructor(adapter: ILayerAdapter, doc: Document) {
     super(adapter);
@@ -16,6 +17,18 @@ export class HTMLLayer extends ABaseLayer implements IHTMLLayer, ILayerImpl {
     this.node.__cy_layer = this;
     this.root.appendChild(this.node);
   }
+
+  callback(callback: INodeUpdateFunction) {
+    this.callbacks.push(callback);
+    this.update();
+    return this;
+  }
+
+  readonly update = () => {
+    for (const o of this.callbacks) {
+      o(this.node);
+    }
+  };
 
   resize() {
     // dummy
@@ -33,6 +46,7 @@ export class HTMLLayer extends ABaseLayer implements IHTMLLayer, ILayerImpl {
 export class HTMLStaticLayer extends ABaseLayer implements IHTMLStaticLayer, ILayerImpl {
   readonly type = 'html-static';
   readonly node: HTMLElement & ILayerElement;
+  readonly callbacks: INodeUpdateFunction[] = [];
 
   constructor(adapter: ILayerAdapter, doc: Document) {
     super(adapter);
@@ -41,6 +55,18 @@ export class HTMLStaticLayer extends ABaseLayer implements IHTMLStaticLayer, ILa
     this.node.__cy_layer = this;
     Object.assign(this.node.style, layerStyle);
   }
+
+  callback(callback: INodeUpdateFunction) {
+    this.callbacks.push(callback);
+    this.update();
+    return this;
+  }
+
+  readonly update = () => {
+    for (const o of this.callbacks) {
+      o(this.node);
+    }
+  };
 
   get root() {
     return this.node;

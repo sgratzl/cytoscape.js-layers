@@ -16,13 +16,16 @@ import {
   CanvasLayer,
   SVGLayer,
   IMoveAbleLayer,
-  IRenderFunction,
   SVGStaticLayer,
   HTMLStaticLayer,
   ISVGStaticLayer,
   IHTMLStaticLayer,
+  CanvasStaticLayer,
+  ICanvasStaticLayer,
 } from './layers';
 import { ILayerAdapter } from './layers/ABaseLayer';
+import { renderPerEdge } from './edges';
+import { renderPerNode } from './nodes';
 
 export default class LayersPlugin {
   readonly cy: cy.Core;
@@ -31,14 +34,16 @@ export default class LayersPlugin {
   readonly dragLayer: ICytoscapeDragLayer;
   readonly selectBoxLayer: ICytoscapeSelectBoxLayer;
 
-  private readonly adapter: ILayerAdapter = {
-    insert: (where: 'before' | 'after', layer: IMoveAbleLayer, type) =>
-      this.insert(where, layer as ILayer & ILayerImpl, type),
-    move: (layer: IMoveAbleLayer, offset) => this.move(layer as ILayer & ILayerImpl, offset),
-  };
+  private readonly adapter: ILayerAdapter;
 
   constructor(cy: cy.Core) {
     this.cy = cy;
+    this.adapter = {
+      cy: this.cy,
+      insert: (where: 'before' | 'after', layer: IMoveAbleLayer, type) =>
+        this.insert(where, layer as ILayer & ILayerImpl, type),
+      move: (layer: IMoveAbleLayer, offset) => this.move(layer as ILayer & ILayerImpl, offset),
+    };
 
     const container = cy.container()!;
 
@@ -148,46 +153,50 @@ export default class LayersPlugin {
     }
   }
 
-  private createLayer(type: 'svg' | 'html' | IRenderFunction | 'svg-static' | 'html-static') {
+  private createLayer(type: 'svg' | 'html' | 'canvas' | 'svg-static' | 'html-static' | 'canvas-static') {
     switch (type) {
       case 'svg':
         return this.init(new SVGLayer(this.adapter, this.document));
       case 'html':
         return this.init(new HTMLLayer(this.adapter, this.document));
+      case 'canvas':
+        return this.init(new CanvasLayer(this.adapter, this.document));
       case 'html-static':
         return this.init(new HTMLStaticLayer(this.adapter, this.document));
       case 'svg-static':
         return this.init(new SVGStaticLayer(this.adapter, this.document));
-      default:
-        return this.init(new CanvasLayer(this.adapter, this.document, type));
+      case 'canvas-static':
+        return this.init(new CanvasStaticLayer(this.adapter, this.document));
     }
   }
 
   append(type: 'svg'): ISVGLayer;
   append(type: 'svg-static'): ISVGStaticLayer;
-  append(type: IRenderFunction): ICanvasLayer;
+  append(type: 'canvas'): ICanvasLayer;
+  append(type: 'canvas-static'): ICanvasStaticLayer;
   append(type: 'html'): IHTMLLayer;
   append(type: 'html-static'): IHTMLStaticLayer;
-  append(type: 'svg' | 'html' | IRenderFunction | 'svg-static' | 'html-static') {
+  append(type: 'svg' | 'html' | 'canvas' | 'canvas-static' | 'svg-static' | 'html-static') {
     const layer = this.createLayer(type);
     this.root.appendChild(layer.root);
     return layer as any;
   }
 
   insert(where: 'before' | 'after', layer: ILayer & ILayerImpl, type: 'svg'): ISVGLayer;
-  insert(where: 'before' | 'after', layer: ILayer & ILayerImpl, type: IRenderFunction): ICanvasLayer;
+  insert(where: 'before' | 'after', layer: ILayer & ILayerImpl, type: 'canvas'): ICanvasLayer;
   insert(where: 'before' | 'after', layer: ILayer & ILayerImpl, type: 'html'): IHTMLLayer;
   insert(where: 'before' | 'after', layer: ILayer & ILayerImpl, type: 'html-static'): IHTMLStaticLayer;
   insert(where: 'before' | 'after', layer: ILayer & ILayerImpl, type: 'svg-static'): ISVGStaticLayer;
+  insert(where: 'before' | 'after', layer: ILayer & ILayerImpl, type: 'canvas-static'): ICanvasStaticLayer;
   insert(
     where: 'before' | 'after',
     layer: ILayer & ILayerImpl,
-    type: 'svg' | 'html' | IRenderFunction | 'svg-static' | 'html-static'
+    type: 'svg' | 'html' | 'canvas' | 'svg-static' | 'html-static' | 'canvas-static'
   ): ISVGLayer | ICanvasLayer | IHTMLLayer;
   insert(
     where: 'before' | 'after',
     ref: ILayer & ILayerImpl,
-    type: 'svg' | 'html' | IRenderFunction | 'svg-static' | 'html-static'
+    type: 'svg' | 'html' | 'canvas' | 'svg-static' | 'html-static' | 'canvas-static'
   ) {
     const layer = this.createLayer(type);
     ref.root.insertAdjacentElement(where === 'before' ? 'beforebegin' : 'afterend', layer.root);
@@ -203,6 +212,9 @@ export default class LayersPlugin {
     const layers = this.layers;
     return layers[0] ?? null;
   }
+
+  readonly renderPerEdge = renderPerEdge;
+  readonly renderPerNode = renderPerNode;
 }
 
 export function layers(this: cy.Core, cy: cy.Core = this) {
