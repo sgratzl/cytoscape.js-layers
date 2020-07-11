@@ -1,5 +1,5 @@
 import cy from 'cytoscape';
-import { ICanvasLayer, IHTMLLayer, ISVGLayer } from './layers';
+import { ICanvasLayer, IHTMLLayer, ISVGLayer, ILayer } from './layers';
 import { SVG_NS } from './layers/SVGLayer';
 import { matchNodes, registerCallback, ICallbackRemover } from './utils';
 
@@ -21,6 +21,7 @@ const defaultOptions: INodeLayerOption = {
 };
 
 export interface IRenderPerNodeResult extends ICallbackRemover {
+  layer: ILayer;
   nodes: cy.NodeCollection;
 }
 
@@ -28,22 +29,22 @@ export function renderPerNode(
   layer: ICanvasLayer,
   render: (ctx: CanvasRenderingContext2D, node: cy.NodeSingular, bb: cy.BoundingBox12 & cy.BoundingBoxWH) => void,
   options?: Partial<INodeLayerOption>
-): ICallbackRemover;
+): IRenderPerNodeResult;
 export function renderPerNode(
   layer: IHTMLLayer,
   render: (elem: HTMLElement, node: cy.NodeSingular, bb: cy.BoundingBox12 & cy.BoundingBoxWH) => void,
   options?: Partial<INodeLayerOption>
-): ICallbackRemover;
+): IRenderPerNodeResult;
 export function renderPerNode(
   layer: ISVGLayer,
   render: (elem: SVGElement, node: cy.NodeSingular, bb: cy.BoundingBox12 & cy.BoundingBoxWH) => void,
   options?: Partial<INodeLayerOption>
-): ICallbackRemover;
+): IRenderPerNodeResult;
 export function renderPerNode(
   layer: ICanvasLayer | IHTMLLayer | ISVGLayer,
   render: (ctx: any, node: cy.NodeSingular, bb: cy.BoundingBox12 & cy.BoundingBoxWH) => void,
   options: Partial<INodeLayerOption> = {}
-): ICallbackRemover {
+): IRenderPerNodeResult {
   const o = Object.assign({}, defaultOptions, options);
   const nodes = o.queryEachTime ? layer.cy.collection() : layer.cy.nodes(o.selector);
 
@@ -56,7 +57,8 @@ export function renderPerNode(
     nodes.on('add remove', layer.update);
   }
 
-  const re = (v: ICallbackRemover) => ({
+  const re = (v: ICallbackRemover): IRenderPerNodeResult => ({
+    layer,
     nodes,
     remove: () => {
       nodes.off('position add remove', undefined, layer.update);

@@ -15,6 +15,7 @@ const defaultOptions: IEdgeLayerOption = {
 };
 
 export interface IRenderPerEdgeResult extends ICallbackRemover {
+  layer: ICanvasLayer;
   edges: cy.EdgeCollection;
 }
 
@@ -31,6 +32,8 @@ export function renderPerEdge(
     layer.updateOnRender = true;
   } else if (autoRender === 'position') {
     edges.on('position add remove', layer.update);
+    edges.sources().on('position', layer.update);
+    edges.targets().on('position', layer.update);
   } else {
     edges.on('add remove', layer.update);
   }
@@ -64,9 +67,12 @@ export function renderPerEdge(
 
   const r = registerCallback(layer, renderer);
   return {
+    layer,
     edges,
     remove: () => {
       edges.off('position add remove', undefined, layer.update);
+      edges.sources().off('position', undefined, layer.update);
+      edges.targets().off('position', undefined, layer.update);
       r.remove();
     },
   };
