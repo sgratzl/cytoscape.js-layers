@@ -11,7 +11,6 @@ npm-debug.log*
 /.pnp.js
 
 # Build files
-/.tmp
 /dist
 
 *.tgz

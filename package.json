@@ -73,12 +73,12 @@
     "typescript": "^3.9.6"
   },
   "scripts": {
-    "clean": "rimraf dist .tmp node_modules",
+    "clean": "rimraf dist node_modules",
     "compile": "tsc -p tsconfig.json --noEmit",
     "start": "npm run watch",
     "watch": "tsdx watch --noClean --name CytoscapeLayers --format esm,umd",
     "build": "npm run clean && tsdx build --name CytoscapeLayers --format esm,umd && npm run typings",
-    "typings": "tsc -p tsconfig.dts.json && rollup -c rollup.dts.config.js",
+    "typings": "rollup -c rollup.dts.config.js",
     "test": "tsdx test --passWithNoTests",
     "test:watch": "tsdx test --passWithNoTests --watch",
     "test:coverage": "tsdx test --passWithNoTests --coverage",
