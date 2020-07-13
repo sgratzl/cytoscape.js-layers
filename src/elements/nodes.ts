@@ -1,6 +1,6 @@
 import cy from 'cytoscape';
-import { ICanvasLayer, IHTMLLayer, ISVGLayer, ILayer } from './layers';
-import { SVG_NS } from './layers/SVGLayer';
+import { ICanvasLayer, IHTMLLayer, ISVGLayer, ILayer } from '../layers';
+import { SVG_NS } from '../layers/SVGLayer';
 import { matchNodes, registerCallback, ICallbackRemover } from './utils';
 
 export interface INodeLayerOption {

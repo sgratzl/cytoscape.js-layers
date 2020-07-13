@@ -1,5 +1,5 @@
 import cy from 'cytoscape';
-import { ICanvasLayer } from './layers';
+import { ICanvasLayer } from '../layers';
 import { ICallbackRemover, registerCallback } from './utils';
 
 export interface IEdgeLayerOption {
@@ -50,6 +50,7 @@ export function renderPerEdge(
       };
       if (impl && impl.pathCache) {
         render(ctx, edge, impl.pathCache);
+        return;
       }
       const path = new Path2D();
       if (impl) {

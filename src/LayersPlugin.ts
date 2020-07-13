@@ -24,8 +24,7 @@ import {
   ICanvasStaticLayer,
 } from './layers';
 import { ILayerAdapter } from './layers/ABaseLayer';
-import { renderPerEdge } from './edges';
-import { renderPerNode } from './nodes';
+import { renderPerEdge, renderPerNode } from './elements';
 
 export default class LayersPlugin {
   readonly cy: cy.Core;

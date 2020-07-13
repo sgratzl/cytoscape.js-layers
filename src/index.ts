@@ -1,8 +1,7 @@
 import { layers } from './LayersPlugin';
 export * from './LayersPlugin';
 export { default as LayersPlugin } from './LayersPlugin';
-export * from './nodes';
-export * from './edges';
+export * from './elements';
 export * from './layers/public';
 
 export default function register(
