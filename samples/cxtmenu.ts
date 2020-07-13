@@ -63,29 +63,16 @@ namespace CXTMenu {
 
   let currentSelection: cytoscape.NodeSingular | null = null;
 
-  function updatePos(e: cytoscape.EventObject) {
+  function updateMenu(e: { target: any }) {
     const node = e.target as cytoscape.NodeSingular;
     const pos = node.renderedPosition();
     menuLayer.node.setAttribute('transform', `translate(${pos.x}, ${pos.y})`);
-  }
 
-  menuLayer.node.style.opacity = '0';
-
-  cy.on('select', 'node', (e) => {
-    const node = e.target as cytoscape.NodeSingular;
-    if (currentSelection) {
-      currentSelection.off('position', undefined, updatePos);
-    }
-    currentSelection = node;
-    updatePos(e);
-    currentSelection.on('position', updatePos);
-
-    const pos = node.renderedPosition();
-    menuLayer.node.setAttribute('transform', `translate(${pos.x}, ${pos.y})`);
     const innerRadius = Math.max(node.renderedWidth(), node.renderedHeight()) / 2;
     const outerRadius = innerRadius + 50;
     const labelRadius = innerRadius + 25;
 
+    // update menu positions and arcs
     Array.from(menuLayer.node.children).forEach((g, i) => {
       const path = g.querySelector('path')!;
       const labelAngle = DEG2RAD * (-90 + i * wedgeAngle + wedgeAngle / 2);
@@ -95,11 +82,29 @@ namespace CXTMenu {
       text.setAttribute('x', r(Math.cos(labelAngle) * labelRadius).toString());
       text.setAttribute('y', r(Math.sin(labelAngle) * labelRadius).toString());
     });
+  }
+
+  menuLayer.node.style.opacity = '0';
+
+  cy.on('viewport', () => {
+    if (currentSelection) {
+      updateMenu({ target: currentSelection });
+    }
+  });
+
+  cy.on('select', 'node', (e) => {
+    const node = e.target as cytoscape.NodeSingular;
+    if (currentSelection) {
+      currentSelection.off('position', undefined, updateMenu);
+    }
+    currentSelection = node;
+    updateMenu(e);
+    currentSelection.on('position', updateMenu);
     menuLayer.node.style.opacity = '1';
   });
   cy.on('unselect', 'node', () => {
     if (currentSelection) {
-      currentSelection.off('position', undefined, updatePos);
+      currentSelection.off('position', undefined, updateMenu);
     }
     currentSelection = null;
     menuLayer.node.style.opacity = '0';
