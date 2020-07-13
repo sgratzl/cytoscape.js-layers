@@ -1,7 +1,7 @@
 import cy from 'cytoscape';
 import { ICanvasLayer, IHTMLLayer, ISVGLayer, ILayer } from '../layers';
 import { SVG_NS } from '../layers/SVGLayer';
-import { matchNodes, registerCallback, ICallbackRemover } from './utils';
+import { matchNodes, registerCallback, ICallbackRemover, IMatchOptions } from './utils';
 import { IElementLayerOptions, defaultElementLayerOptions } from './common';
 
 export interface INodeLayerOption extends IElementLayerOptions {
@@ -91,73 +91,55 @@ export function renderPerNode(
     };
     return re(registerCallback(layer, renderer));
   }
-  const bb = (node: cy.NodeSingular) => node.boundingBox(o.boundingBox);
-  const isVisible = o.checkBounds ? (bb: cy.BoundingBox12 & cy.BoundingBoxWH) => layer.isVisible(bb) : () => true;
+
+  // HTML or SVG
+  const baseOptions = {
+    bb: (node: cy.NodeSingular) => node.boundingBox(o.boundingBox),
+    isVisible: o.checkBounds ? (bb: cy.BoundingBox12 & cy.BoundingBoxWH) => layer.isVisible(bb) : () => true,
+    uniqueElements: o.uniqueElements === true,
+  };
 
   if (layer.type === 'html') {
-    const enter = (node: cy.NodeSingular, bb: cy.BoundingBox12 & cy.BoundingBoxWH) => {
-      const r = layer.node.ownerDocument.createElement('div');
-      r.style.position = 'absolute';
-      if (o.init) {
-        o.init(r, node, bb);
-      }
-      return r;
+    const matchOptions: IMatchOptions<HTMLElement> = {
+      ...baseOptions,
+      enter: (node: cy.NodeSingular, bb: cy.BoundingBox12 & cy.BoundingBoxWH) => {
+        const r = layer.node.ownerDocument.createElement('div');
+        r.style.position = 'absolute';
+        if (o.init) {
+          o.init(r, node, bb);
+        }
+        return r;
+      },
+      update: (elem, node, bb) => {
+        elem.style.transform = `translate(${bb.x1}px,${bb.y1}px)`;
+        render(elem, node, bb);
+      },
     };
-    if (!o.queryEachTime) {
-      matchNodes(layer.node, nodes, {
-        bb,
-        isVisible,
-        enter,
-        update: () => undefined,
-        uniqueElements: o.uniqueElements === true,
-      });
-    }
     const renderer = (root: HTMLElement) => {
       const currentNodes = o.queryEachTime ? layer.cy.nodes(o.selector) : nodes;
-
-      matchNodes(root, currentNodes, {
-        bb,
-        isVisible,
-        enter,
-        update: (elem, node, bb) => {
-          elem.style.transform = `translate(${bb.x1}px,${bb.y1}px)`;
-          render(elem, node, bb);
-        },
-        uniqueElements: o.uniqueElements === true,
-      });
+      matchNodes(root, currentNodes, matchOptions);
     };
     return re(registerCallback(layer, renderer));
   }
 
   // if (layer.type === 'svg') {
-  const enter = (node: cy.NodeSingular, bb: cy.BoundingBox12 & cy.BoundingBoxWH) => {
-    const r = layer.node.ownerDocument.createElementNS(SVG_NS, 'g');
-    if (o.init) {
-      o.init(r, node, bb);
-    }
-    return r;
+  const matchOptions: IMatchOptions<SVGElement> = {
+    ...baseOptions,
+    enter: (node: cy.NodeSingular, bb: cy.BoundingBox12 & cy.BoundingBoxWH) => {
+      const r = layer.node.ownerDocument.createElementNS(SVG_NS, 'g');
+      if (o.init) {
+        o.init(r, node, bb);
+      }
+      return r;
+    },
+    update: (elem, node, bb) => {
+      elem.setAttribute('transform', `translate(${bb.x1},${bb.y1})`);
+      render(elem, node, bb);
+    },
   };
-  if (!o.queryEachTime) {
-    matchNodes(layer.node, nodes, {
-      bb,
-      isVisible,
-      enter,
-      update: () => undefined,
-      uniqueElements: o.uniqueElements === true,
-    });
-  }
   const renderer = (root: SVGElement) => {
     const currentNodes = o.queryEachTime ? layer.cy.nodes(o.selector) : nodes;
-    matchNodes(root, currentNodes, {
-      bb,
-      isVisible,
-      enter,
-      update: (elem, node, bb) => {
-        elem.setAttribute('transform', `translate(${bb.x1},${bb.y1})`);
-        render(elem, node, bb);
-      },
-      uniqueElements: o.uniqueElements === true,
-    });
+    matchNodes(root, currentNodes, matchOptions);
   };
   return re(registerCallback(layer, renderer));
 }

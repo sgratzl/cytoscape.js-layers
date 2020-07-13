@@ -1,15 +1,17 @@
 import cy from 'cytoscape';
 
+export interface IMatchOptions<T extends HTMLElement | SVGElement> {
+  bb: (node: cy.NodeSingular) => cy.BoundingBox12 & cy.BoundingBoxWH;
+  isVisible: (bb: cy.BoundingBox12 & cy.BoundingBoxWH) => boolean;
+  enter: (node: cy.NodeSingular, bb: cy.BoundingBox12 & cy.BoundingBoxWH) => T;
+  update: (elem: T, node: cy.NodeSingular, bb: cy.BoundingBox12 & cy.BoundingBoxWH) => void;
+  uniqueElements: boolean;
+}
+
 export function matchNodes<T extends HTMLElement | SVGElement>(
   root: T,
   nodes: cy.NodeCollection,
-  options: {
-    bb: (node: cy.NodeSingular) => cy.BoundingBox12 & cy.BoundingBoxWH;
-    isVisible: (bb: cy.BoundingBox12 & cy.BoundingBoxWH) => boolean;
-    enter: (node: cy.NodeSingular, bb: cy.BoundingBox12 & cy.BoundingBoxWH) => T;
-    update: (elem: T, node: cy.NodeSingular, bb: cy.BoundingBox12 & cy.BoundingBoxWH) => void;
-    uniqueElements: boolean;
-  }
+  options: IMatchOptions<T>
 ) {
   const arr = Array.from(root.children) as T[];
   if (!options.uniqueElements) {
@@ -23,7 +25,7 @@ export function matchNodes<T extends HTMLElement | SVGElement>(
       } else {
         const elem = options.enter(node, bb);
         root.appendChild(elem);
-        options.update(arr.shift()!, node, bb);
+        options.update(elem, node, bb);
       }
     });
     for (const rest of arr) {
