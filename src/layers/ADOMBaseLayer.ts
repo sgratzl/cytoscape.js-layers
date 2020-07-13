@@ -26,6 +26,9 @@ export abstract class ADOMBaseLayer<T extends HTMLElement | SVGElement> extends 
   }
 
   set visible(value: boolean) {
+    if (this.visible == value) {
+      return;
+    }
     this.root.style.display = value ? '' : 'none';
   }
 
