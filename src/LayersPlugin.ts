@@ -256,6 +256,8 @@ export default class LayersPlugin {
   readonly renderPerNode = renderPerNode;
 }
 
+export function layers(this: cy.Core): LayersPlugin;
+export function layers(cy: cy.Core): LayersPlugin;
 export function layers(this: cy.Core, cy: cy.Core = this) {
   if (!cy.container()) {
     throw new Error('layers plugin does not work in headless environments');

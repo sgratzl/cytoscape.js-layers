@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Sample</title>
+    <style>
+      #app {
+        width: 600px;
+        height: 400px;
+        display: block;
+      }
+
+      .menuItem > text {
+        fill: white;
+      }
+      .menuItem > path {
+        fill: #0e0e0e;
+        stroke: white;
+      }
+      .menuItem:hover > path {
+        fill: black;
+        stroke: black;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script src="https://cdn.jsdelivr.net/npm/cytoscape"></script>
+    <script src="../dist/cytoscapelayers.umd.development.js"></script>
+    <script src="cxtmenu.js"></script>
+  </body>
+</html>

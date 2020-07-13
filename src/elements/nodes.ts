@@ -6,6 +6,8 @@ import { IElementLayerOptions, defaultElementLayerOptions } from './common';
 
 export interface INodeLayerOption extends IElementLayerOptions {
   boundingBox: cy.BoundingBoxOptions;
+  position: 'none' | 'top-left' | 'center';
+  transform?: string;
 }
 
 export interface INodeDOMLayerOption<T extends HTMLElement | SVGElement> extends INodeLayerOption {
@@ -49,10 +51,13 @@ export function renderPerNode(
 ): IRenderPerNodeResult {
   const o = Object.assign(
     {
+      transform: '',
+      position: 'top-left',
       boundingBox: {
         includeLabels: false,
         includeOverlays: false,
       },
+      uniqueElements: false,
     },
     defaultElementLayerOptions(options),
     options
@@ -84,9 +89,16 @@ export function renderPerNode(
         if (o.checkBounds && !layer.inVisibleBounds(bb)) {
           return;
         }
-        ctx.translate(bb.x1, bb.y1);
+        if (o.position === 'top-left') {
+          ctx.translate(bb.x1, bb.y1);
+        } else if (o.position === 'center') {
+          const pos = node.position();
+          ctx.translate(pos.x, pos.y);
+        }
         render(ctx, node, bb);
-        ctx.setTransform(t);
+        if (o.position !== 'none') {
+          ctx.setTransform(t);
+        }
       });
     };
     return re(registerCallback(layer, renderer));
@@ -114,7 +126,12 @@ export function renderPerNode(
         return r;
       },
       update: (elem, node, bb) => {
-        elem.style.transform = `translate(${bb.x1}px,${bb.y1}px)`;
+        if (o.position === 'top-left') {
+          elem.style.transform = `${o.transform}translate(${bb.x1}px,${bb.y1}px)`;
+        } else if (o.position === 'center') {
+          const pos = node.position();
+          elem.style.transform = `${o.transform}translate(${pos.x}px,${pos.y}px)`;
+        }
         render(elem, node, bb);
       },
     };
@@ -136,7 +153,12 @@ export function renderPerNode(
       return r;
     },
     update: (elem, node, bb) => {
-      elem.setAttribute('transform', `translate(${bb.x1},${bb.y1})`);
+      if (o.position === 'top-left') {
+        elem.setAttribute('transform', `${o.transform}translate(${bb.x1},${bb.y1})`);
+      } else if (o.position === 'center') {
+        const pos = node.position();
+        elem.setAttribute('transform', `${o.transform}translate(${pos.x},${pos.y})`);
+      }
       render(elem, node, bb);
     },
   };

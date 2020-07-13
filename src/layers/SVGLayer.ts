@@ -27,14 +27,14 @@ export class SVGLayer extends ADOMBaseLayer<SVGElement> implements ISVGLayer, IL
 
 export class SVGStaticLayer extends ADOMBaseLayer<SVGElement> implements ISVGStaticLayer, ILayerImpl {
   readonly type = 'svg-static';
+  readonly node: SVGGElement & ILayerElement;
 
   constructor(adapter: ILayerAdapter, doc: Document) {
     super(adapter, doc.createElementNS(SVG_NS, 'svg'));
     this.root.__cy_layer = this;
-  }
-
-  get node() {
-    return this.root;
+    this.node = (doc.createElementNS(SVG_NS, 'g') as unknown) as SVGGElement & ILayerElement;
+    this.node.__cy_layer = this;
+    this.root.appendChild(this.node);
   }
 
   setViewport() {

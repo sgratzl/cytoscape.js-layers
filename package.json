@@ -75,6 +75,8 @@
     "clean": "rimraf dist node_modules",
     "compile": "tsc -p tsconfig.json --noEmit",
     "start": "npm run watch",
+    "samples": "tsc -p samples/tsconfig.json",
+    "samples:watch": "tsc -p samples/tsconfig.json -w",
     "watch": "tsdx watch --noClean --name CytoscapeLayers --format esm,umd",
     "build": "npm run clean && tsdx build --name CytoscapeLayers --format esm,umd && npm run typings",
     "typings": "rollup -c rollup.dts.config.js",
