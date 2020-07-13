@@ -22,6 +22,9 @@ import {
   IHTMLStaticLayer,
   CanvasStaticLayer,
   ICanvasStaticLayer,
+  IHTMLLayerOptions,
+  ISVGLayerOptions,
+  ICanvasLayerOptions,
 } from './layers';
 import { ILayerAdapter } from './layers/ABaseLayer';
 import { renderPerEdge, renderPerNode } from './elements';
@@ -192,52 +195,54 @@ export default class LayersPlugin {
     }
   }
 
-  private createLayer(type: 'svg' | 'html' | 'canvas' | 'svg-static' | 'html-static' | 'canvas-static') {
+  private createLayer(type: 'svg' | 'html' | 'canvas' | 'svg-static' | 'html-static' | 'canvas-static', options?: IHTMLLayerOptions | ISVGLayerOptions | ICanvasLayerOptions) {
     switch (type) {
       case 'svg':
-        return this.init(new SVGLayer(this.adapter, this.document));
+        return this.init(new SVGLayer(this.adapter, this.document, options));
       case 'html':
-        return this.init(new HTMLLayer(this.adapter, this.document));
+        return this.init(new HTMLLayer(this.adapter, this.document, options));
       case 'canvas':
-        return this.init(new CanvasLayer(this.adapter, this.document));
+        return this.init(new CanvasLayer(this.adapter, this.document, options));
       case 'html-static':
-        return this.init(new HTMLStaticLayer(this.adapter, this.document));
+        return this.init(new HTMLStaticLayer(this.adapter, this.document, options));
       case 'svg-static':
-        return this.init(new SVGStaticLayer(this.adapter, this.document));
+        return this.init(new SVGStaticLayer(this.adapter, this.document, options));
       case 'canvas-static':
-        return this.init(new CanvasStaticLayer(this.adapter, this.document));
+        return this.init(new CanvasStaticLayer(this.adapter, this.document, options));
     }
   }
 
-  append(type: 'svg'): ISVGLayer;
-  append(type: 'svg-static'): ISVGStaticLayer;
-  append(type: 'canvas'): ICanvasLayer;
-  append(type: 'canvas-static'): ICanvasStaticLayer;
-  append(type: 'html'): IHTMLLayer;
-  append(type: 'html-static'): IHTMLStaticLayer;
-  append(type: 'svg' | 'html' | 'canvas' | 'canvas-static' | 'svg-static' | 'html-static') {
-    const layer = this.createLayer(type);
+  append(type: 'svg', options?: ISVGLayerOptions): ISVGLayer;
+  append(type: 'svg-static', options?: ISVGLayerOptions): ISVGStaticLayer;
+  append(type: 'canvas', options?: ICanvasLayerOptions): ICanvasLayer;
+  append(type: 'canvas-static', options?: ICanvasLayerOptions): ICanvasStaticLayer;
+  append(type: 'html', options?: IHTMLLayerOptions): IHTMLLayer;
+  append(type: 'html-static', options?: IHTMLLayerOptions): IHTMLStaticLayer;
+  append(type: 'svg' | 'html' | 'canvas' | 'canvas-static' | 'svg-static' | 'html-static', options?: IHTMLLayerOptions | ISVGLayerOptions | ICanvasLayerOptions) {
+    const layer = this.createLayer(type, options);
     this.root.appendChild(layer.root);
     return layer as any;
   }
 
-  insert(where: 'before' | 'after', layer: ILayer & ILayerImpl, type: 'svg'): ISVGLayer;
-  insert(where: 'before' | 'after', layer: ILayer & ILayerImpl, type: 'canvas'): ICanvasLayer;
-  insert(where: 'before' | 'after', layer: ILayer & ILayerImpl, type: 'html'): IHTMLLayer;
-  insert(where: 'before' | 'after', layer: ILayer & ILayerImpl, type: 'html-static'): IHTMLStaticLayer;
-  insert(where: 'before' | 'after', layer: ILayer & ILayerImpl, type: 'svg-static'): ISVGStaticLayer;
-  insert(where: 'before' | 'after', layer: ILayer & ILayerImpl, type: 'canvas-static'): ICanvasStaticLayer;
+  insert(where: 'before' | 'after', layer: ILayer & ILayerImpl, type: 'svg', options?: ISVGLayerOptions): ISVGLayer;
+  insert(where: 'before' | 'after', layer: ILayer & ILayerImpl, type: 'svg-static', options?: ISVGLayerOptions): ISVGStaticLayer;
+  insert(where: 'before' | 'after', layer: ILayer & ILayerImpl, type: 'canvas', options?: ICanvasLayerOptions): ICanvasLayer;
+  insert(where: 'before' | 'after', layer: ILayer & ILayerImpl, type: 'canvas-static', options?: ICanvasLayerOptions): ICanvasStaticLayer;
+  insert(where: 'before' | 'after', layer: ILayer & ILayerImpl, type: 'html', options?: IHTMLLayerOptions): IHTMLLayer;
+  insert(where: 'before' | 'after', layer: ILayer & ILayerImpl, type: 'html-static', options?: IHTMLLayerOptions): IHTMLStaticLayer;
   insert(
     where: 'before' | 'after',
     layer: ILayer & ILayerImpl,
-    type: 'svg' | 'html' | 'canvas' | 'svg-static' | 'html-static' | 'canvas-static'
+    type: 'svg' | 'html' | 'canvas' | 'svg-static' | 'html-static' | 'canvas-static',
+    options?: IHTMLLayerOptions | ISVGLayerOptions | ICanvasLayerOptions
   ): ISVGLayer | ICanvasLayer | IHTMLLayer;
   insert(
     where: 'before' | 'after',
     ref: ILayer & ILayerImpl,
-    type: 'svg' | 'html' | 'canvas' | 'svg-static' | 'html-static' | 'canvas-static'
+    type: 'svg' | 'html' | 'canvas' | 'svg-static' | 'html-static' | 'canvas-static',
+    options?: IHTMLLayerOptions | ISVGLayerOptions | ICanvasLayerOptions
   ) {
-    const layer = this.createLayer(type);
+    const layer = this.createLayer(type, options);
     ref.root.insertAdjacentElement(where === 'before' ? 'beforebegin' : 'afterend', layer.root);
     return layer as any;
   }

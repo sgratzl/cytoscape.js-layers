@@ -1,6 +1,7 @@
 import { ICanvasLayer, ILayerElement, ILayerImpl, IRenderFunction, ICanvasStaticLayer } from './interfaces';
-import { layerStyle } from './utils';
+import { layerStyle, stopClicks } from './utils';
 import { ABaseLayer, ILayerAdapter } from './ABaseLayer';
+import { ICanvasLayerOptions } from './public';
 
 export class CanvasBaseLayer extends ABaseLayer implements ILayerImpl {
   readonly node: HTMLCanvasElement & ILayerElement;
@@ -13,14 +14,13 @@ export class CanvasBaseLayer extends ABaseLayer implements ILayerImpl {
     zoom: 1,
   };
 
-  constructor(
-    adapter: ILayerAdapter,
-    doc: Document,
-    options: Partial<CanvasRenderingContext2DSettings & { pixelRatio: number }> = {}
-  ) {
+  constructor(adapter: ILayerAdapter, doc: Document, options: ICanvasLayerOptions = {}) {
     super(adapter);
     this.node = (doc.createElement('canvas') as unknown) as HTMLCanvasElement & ILayerElement;
     Object.assign(this.node.style, layerStyle);
+    if (options.stopClicks) {
+      stopClicks(this.node);
+    }
     this.pixelRatio = options.pixelRatio ?? (window ?? {}).devicePixelRatio ?? 1;
     this.ctx = this.node.getContext('2d', options)!;
     this.ctx.resetTransform();
@@ -93,11 +93,7 @@ export class CanvasBaseLayer extends ABaseLayer implements ILayerImpl {
 export class CanvasLayer extends CanvasBaseLayer implements ICanvasLayer {
   readonly type = 'canvas';
 
-  constructor(
-    adapter: ILayerAdapter,
-    doc: Document,
-    options: Partial<CanvasRenderingContext2DSettings & { pixelRatio: number }> = {}
-  ) {
+  constructor(adapter: ILayerAdapter, doc: Document, options: ICanvasLayerOptions = {}) {
     super(adapter, doc, options);
     this.node.__cy_layer = this;
   }
@@ -113,11 +109,7 @@ export class CanvasLayer extends CanvasBaseLayer implements ICanvasLayer {
 export class CanvasStaticLayer extends CanvasBaseLayer implements ICanvasStaticLayer {
   readonly type = 'canvas-static';
 
-  constructor(
-    adapter: ILayerAdapter,
-    doc: Document,
-    options: Partial<CanvasRenderingContext2DSettings & { pixelRatio: number }> = {}
-  ) {
+  constructor(adapter: ILayerAdapter, doc: Document, options: ICanvasLayerOptions = {}) {
     super(adapter, doc, options);
     this.node.__cy_layer = this;
   }

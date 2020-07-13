@@ -1,14 +1,15 @@
 import { ILayerAdapter } from './ABaseLayer';
 import { ADOMBaseLayer } from './ADOMBaseLayer';
 import { IHTMLLayer, IHTMLStaticLayer, ILayerElement, ILayerImpl } from './interfaces';
+import { IHTMLLayerOptions } from './public';
 
 export class HTMLLayer extends ADOMBaseLayer<HTMLElement> implements IHTMLLayer, ILayerImpl {
   readonly type = 'html';
   readonly node: HTMLDivElement & ILayerElement;
   updateOnTransform = false;
 
-  constructor(adapter: ILayerAdapter, doc: Document) {
-    super(adapter, doc.createElement('div'));
+  constructor(adapter: ILayerAdapter, doc: Document, options: IHTMLLayerOptions = {}) {
+    super(adapter, doc.createElement('div'), options);
     this.root.__cy_layer = this;
     this.node = (doc.createElement('div') as unknown) as HTMLDivElement & ILayerElement;
     this.node.__cy_layer = this;
@@ -29,8 +30,8 @@ export class HTMLLayer extends ADOMBaseLayer<HTMLElement> implements IHTMLLayer,
 export class HTMLStaticLayer extends ADOMBaseLayer<HTMLElement> implements IHTMLStaticLayer, ILayerImpl {
   readonly type = 'html-static';
 
-  constructor(adapter: ILayerAdapter, doc: Document) {
-    super(adapter, doc.createElement('div'));
+  constructor(adapter: ILayerAdapter, doc: Document, options: IHTMLLayerOptions = {}) {
+    super(adapter, doc.createElement('div'), options);
     this.node.__cy_layer = this;
   }
 

@@ -9,6 +9,7 @@ import {
   ICanvasStaticLayer,
 } from './interfaces';
 import cy from 'cytoscape';
+import { ICanvasLayerOptions, ISVGLayerOptions, IHTMLLayerOptions } from './public';
 
 export interface ILayerAdapter {
   cy: cy.Core;
@@ -16,7 +17,8 @@ export interface ILayerAdapter {
   insert(
     where: 'before' | 'after',
     layer: IMoveAbleLayer,
-    type: 'svg' | 'html' | 'canvas' | 'svg-static' | 'html-static' | 'canvas-static'
+    type: 'svg' | 'html' | 'canvas' | 'svg-static' | 'html-static' | 'canvas-static',
+    options?: IHTMLLayerOptions | ICanvasLayerOptions | ISVGLayerOptions
   ): ILayer;
   inVisibleBounds(p: { x: number; y: number } | cy.BoundingBox12): boolean;
 }
@@ -65,23 +67,29 @@ export abstract class ABaseLayer implements IMoveAbleLayer {
     this.adapter.move(this, Number.POSITIVE_INFINITY);
   }
 
-  insertBefore(type: 'svg'): ISVGLayer;
-  insertBefore(type: 'svg-static'): ISVGStaticLayer;
-  insertBefore(type: 'canvas'): ICanvasLayer;
-  insertBefore(type: 'html'): IHTMLLayer;
-  insertBefore(type: 'html-static'): IHTMLStaticLayer;
-  insertBefore(type: 'canvas-static'): ICanvasStaticLayer;
-  insertBefore(type: 'svg' | 'html' | 'canvas' | 'svg-static' | 'html-static' | 'canvas-static') {
-    return this.adapter.insert('before', this, type);
+  insertBefore(type: 'svg', options?: ISVGLayerOptions): ISVGLayer;
+  insertBefore(type: 'svg-static', options?: ISVGLayerOptions): ISVGStaticLayer;
+  insertBefore(type: 'canvas', options?: ICanvasLayerOptions): ICanvasLayer;
+  insertBefore(type: 'canvas-static', options?: ICanvasLayerOptions): ICanvasStaticLayer;
+  insertBefore(type: 'html', options?: IHTMLLayerOptions): IHTMLLayer;
+  insertBefore(type: 'html-static', options?: IHTMLLayerOptions): IHTMLStaticLayer;
+  insertBefore(
+    type: 'svg' | 'html' | 'canvas' | 'svg-static' | 'html-static' | 'canvas-static',
+    options?: IHTMLLayerOptions | ISVGLayerOptions | ICanvasLayerOptions
+  ) {
+    return this.adapter.insert('before', this, type, options);
   }
 
-  insertAfter(type: 'svg'): ISVGLayer;
-  insertAfter(type: 'svg-static'): ISVGStaticLayer;
-  insertAfter(type: 'canvas'): ICanvasLayer;
-  insertAfter(type: 'html'): IHTMLLayer;
-  insertAfter(type: 'html-static'): IHTMLStaticLayer;
-  insertAfter(type: 'canvas-static'): ICanvasStaticLayer;
-  insertAfter(type: 'svg' | 'html' | 'canvas' | 'svg-static' | 'html-static' | 'canvas-static') {
-    return this.adapter.insert('after', this, type);
+  insertAfter(type: 'svg', options?: ISVGLayerOptions): ISVGLayer;
+  insertAfter(type: 'svg-static', options?: ISVGLayerOptions): ISVGStaticLayer;
+  insertAfter(type: 'canvas', options?: ICanvasLayerOptions): ICanvasLayer;
+  insertAfter(type: 'canvas-static', options?: ICanvasLayerOptions): ICanvasStaticLayer;
+  insertAfter(type: 'html', options?: IHTMLLayerOptions): IHTMLLayer;
+  insertAfter(type: 'html-static', options?: IHTMLLayerOptions): IHTMLStaticLayer;
+  insertAfter(
+    type: 'svg' | 'html' | 'canvas' | 'svg-static' | 'html-static' | 'canvas-static',
+    options?: IHTMLLayerOptions | ISVGLayerOptions | ICanvasLayerOptions
+  ) {
+    return this.adapter.insert('after', this, type, options);
   }
 }

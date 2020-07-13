@@ -8,13 +8,23 @@ export interface IDOMUpdateFunction<T extends HTMLElement | SVGElement> {
   (node: T): void;
 }
 
+export interface ILayerOptions {
+  stopClicks?: boolean;
+}
+
+export interface ISVGLayerOptions extends ILayerOptions {}
+export interface IHTMLLayerOptions extends ILayerOptions {}
+export interface ICanvasLayerOptions extends ILayerOptions, Partial<CanvasRenderingContext2DSettings> {
+  pixelRatio?: number;
+}
+
 export interface ILayerDescFunction {
-  (type: 'svg'): ISVGLayer;
-  (type: 'svg-static'): ISVGStaticLayer;
-  (type: 'canvas'): ICanvasLayer;
-  (type: 'canvas-static'): ICanvasStaticLayer;
-  (type: 'html'): IHTMLLayer;
-  (type: 'html-static'): IHTMLStaticLayer;
+  (type: 'svg', options?: ISVGLayerOptions): ISVGLayer;
+  (type: 'svg-static', options?: ISVGLayerOptions): ISVGStaticLayer;
+  (type: 'canvas', options?: ICanvasLayerOptions): ICanvasLayer;
+  (type: 'canvas-static', options?: ICanvasLayerOptions): ICanvasStaticLayer;
+  (type: 'html', options?: IHTMLLayerOptions): IHTMLLayer;
+  (type: 'html-static', options?: IHTMLLayerOptions): IHTMLStaticLayer;
 }
 
 export interface IMoveAbleLayer {
