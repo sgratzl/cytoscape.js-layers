@@ -26,6 +26,20 @@ export class CanvasBaseLayer extends ABaseLayer implements ILayerImpl {
     this.ctx.resetTransform();
   }
 
+  get visible() {
+    return this.node.style.display !== 'none';
+  }
+
+  set visible(value: boolean) {
+    this.node.style.display = value ? '' : 'none';
+  }
+  show() {
+    this.visible = true;
+  }
+  hide() {
+    this.visible = false;
+  }
+
   get root() {
     return this.node;
   }

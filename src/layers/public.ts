@@ -4,12 +4,8 @@ export interface IRenderFunction {
   (ctx: CanvasRenderingContext2D): void;
 }
 
-export interface INodeUpdateFunction {
-  (node: HTMLElement): void;
-}
-
-export interface ISVGNodeUpdateFunction {
-  (node: SVGElement): void;
+export interface IDOMUpdateFunction<T extends HTMLElement | SVGElement> {
+  (node: T): void;
 }
 
 export interface ILayerDescFunction {
@@ -35,6 +31,9 @@ export interface IMoveAbleLayer {
 
 export interface ICustomLayer extends IMoveAbleLayer {
   remove(): void;
+  hide(): void;
+  show(): void;
+  visible: boolean;
 
   updateOnRender: boolean;
   update(): void;
@@ -45,7 +44,7 @@ export interface ITransformedLayer extends ICustomLayer {
    * checks whether the given point in model coordinates is visible i.e., within the visible rendered bounds
    * @param point
    */
-  isVisible(point: { x: number; y: number } | cy.BoundingBox12): boolean;
+  inVisibleBounds(point: { x: number; y: number } | cy.BoundingBox12): boolean;
 }
 
 export interface ISVGLayer extends ITransformedLayer {
@@ -53,16 +52,16 @@ export interface ISVGLayer extends ITransformedLayer {
   readonly node: SVGElement;
   updateOnTransform: boolean;
 
-  readonly callbacks: ISVGNodeUpdateFunction[];
-  callback(callback: ISVGNodeUpdateFunction): ISVGLayer;
+  readonly callbacks: IDOMUpdateFunction<SVGElement>[];
+  callback(callback: IDOMUpdateFunction<SVGElement>): ISVGLayer;
 }
 
 export interface ISVGStaticLayer extends ICustomLayer {
   readonly type: 'svg-static';
   readonly node: SVGElement;
 
-  readonly callbacks: ISVGNodeUpdateFunction[];
-  callback(callback: ISVGNodeUpdateFunction): ISVGStaticLayer;
+  readonly callbacks: IDOMUpdateFunction<SVGElement>[];
+  callback(callback: IDOMUpdateFunction<SVGElement>): ISVGStaticLayer;
 }
 export interface ICanvasLayer extends ITransformedLayer {
   readonly type: 'canvas';
@@ -83,16 +82,16 @@ export interface IHTMLLayer extends ITransformedLayer {
   readonly node: HTMLElement;
   updateOnTransform: boolean;
 
-  readonly callbacks: INodeUpdateFunction[];
-  callback(callback: INodeUpdateFunction): IHTMLLayer;
+  readonly callbacks: IDOMUpdateFunction<HTMLElement>[];
+  callback(callback: IDOMUpdateFunction<HTMLElement>): IHTMLLayer;
 }
 
 export interface IHTMLStaticLayer extends ICustomLayer {
   readonly type: 'html-static';
   readonly node: HTMLElement;
 
-  readonly callbacks: INodeUpdateFunction[];
-  callback(callback: INodeUpdateFunction): IHTMLStaticLayer;
+  readonly callbacks: IDOMUpdateFunction<HTMLElement>[];
+  callback(callback: IDOMUpdateFunction<HTMLElement>): IHTMLStaticLayer;
 }
 
 export interface ICytoscapeNodeLayer extends IMoveAbleLayer {

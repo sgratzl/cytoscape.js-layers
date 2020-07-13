@@ -39,7 +39,7 @@ export function renderPerEdge(
       if (o.checkBounds) {
         const s = impl ? { x: impl.startX, y: impl.startY } : edge.sourceEndpoint();
         const t = impl ? { x: impl.endX, y: impl.endY } : edge.targetEndpoint();
-        if (!layer.isVisible(s) && !layer.isVisible(t)) {
+        if (!layer.inVisibleBounds(s) && !layer.inVisibleBounds(t)) {
           // both outside
           return;
         }

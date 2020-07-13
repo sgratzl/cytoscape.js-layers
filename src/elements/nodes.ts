@@ -81,7 +81,7 @@ export function renderPerNode(
       const currentNodes = o.queryEachTime ? layer.cy.nodes(o.selector) : nodes;
       currentNodes.forEach((node) => {
         const bb = node.boundingBox(o.boundingBox);
-        if (o.checkBounds && !layer.isVisible(bb)) {
+        if (o.checkBounds && !layer.inVisibleBounds(bb)) {
           return;
         }
         ctx.translate(bb.x1, bb.y1);
@@ -95,7 +95,7 @@ export function renderPerNode(
   // HTML or SVG
   const baseOptions = {
     bb: (node: cy.NodeSingular) => node.boundingBox(o.boundingBox),
-    isVisible: o.checkBounds ? (bb: cy.BoundingBox12 & cy.BoundingBoxWH) => layer.isVisible(bb) : () => true,
+    isVisible: o.checkBounds ? (bb: cy.BoundingBox12 & cy.BoundingBoxWH) => layer.inVisibleBounds(bb) : () => true,
     uniqueElements: o.uniqueElements === true,
   };
   if (o.checkBounds) {

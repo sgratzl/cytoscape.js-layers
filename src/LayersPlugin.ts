@@ -48,7 +48,7 @@ export default class LayersPlugin {
       insert: (where: 'before' | 'after', layer: IMoveAbleLayer, type) =>
         this.insert(where, layer as ILayer & ILayerImpl, type),
       move: (layer: IMoveAbleLayer, offset) => this.move(layer as ILayer & ILayerImpl, offset),
-      isVisible: (p: { x: number; y: number } | cy.BoundingBox12) => {
+      inVisibleBounds: (p: { x: number; y: number } | cy.BoundingBox12) => {
         const v = this.viewport;
         const inX = (x: number) => {
           const xp = x * v.zoom + v.tx;

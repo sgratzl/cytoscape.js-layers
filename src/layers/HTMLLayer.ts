@@ -1,20 +1,14 @@
-import { ABaseLayer, ILayerAdapter } from './ABaseLayer';
-import { IHTMLLayer, ILayerElement, ILayerImpl, IHTMLStaticLayer, INodeUpdateFunction } from './interfaces';
-import { layerStyle } from './utils';
+import { ADOMBaseLayer, ILayerAdapter } from './ABaseLayer';
+import { IHTMLLayer, IHTMLStaticLayer, ILayerElement, ILayerImpl } from './interfaces';
 
-export class HTMLLayer extends ABaseLayer implements IHTMLLayer, ILayerImpl {
+export class HTMLLayer extends ADOMBaseLayer<HTMLElement> implements IHTMLLayer, ILayerImpl {
   readonly type = 'html';
   readonly node: HTMLDivElement & ILayerElement;
-  readonly root: HTMLElement & ILayerElement;
-  readonly callbacks: INodeUpdateFunction[] = [];
   updateOnTransform = false;
 
   constructor(adapter: ILayerAdapter, doc: Document) {
-    super(adapter);
-    this.root = (doc.createElement('div') as unknown) as HTMLDivElement & ILayerElement;
-    Object.assign(this.root.style, layerStyle);
+    super(adapter, doc.createElement('div'));
     this.root.__cy_layer = this;
-    this.root.style.overflow = 'hidden';
     this.node = (doc.createElement('div') as unknown) as HTMLDivElement & ILayerElement;
     this.node.__cy_layer = this;
     this.node.style.position = 'absolute';
@@ -23,72 +17,27 @@ export class HTMLLayer extends ABaseLayer implements IHTMLLayer, ILayerImpl {
     this.root.appendChild(this.node);
   }
 
-  callback(callback: INodeUpdateFunction) {
-    this.callbacks.push(callback);
-    this.update();
-    return this;
-  }
-
-  readonly update = () => {
-    for (const o of this.callbacks) {
-      o(this.node);
-    }
-  };
-
-  resize() {
-    // dummy
-  }
-
   setViewport(tx: number, ty: number, zoom: number) {
     this.node.style.transform = `translate(${tx}px,${ty}px)scale(${zoom})`;
     if (this.updateOnTransform) {
       this.update();
     }
   }
-
-  remove() {
-    this.root.remove();
-  }
 }
 
-export class HTMLStaticLayer extends ABaseLayer implements IHTMLStaticLayer, ILayerImpl {
+export class HTMLStaticLayer extends ADOMBaseLayer<HTMLElement> implements IHTMLStaticLayer, ILayerImpl {
   readonly type = 'html-static';
-  readonly node: HTMLElement & ILayerElement;
-  readonly callbacks: INodeUpdateFunction[] = [];
 
   constructor(adapter: ILayerAdapter, doc: Document) {
-    super(adapter);
-    this.node = (doc.createElement('div') as unknown) as HTMLDivElement & ILayerElement;
-    this.node.style.overflow = 'hidden';
+    super(adapter, doc.createElement('div'));
     this.node.__cy_layer = this;
-    Object.assign(this.node.style, layerStyle);
   }
 
-  callback(callback: INodeUpdateFunction) {
-    this.callbacks.push(callback);
-    this.update();
-    return this;
-  }
-
-  readonly update = () => {
-    for (const o of this.callbacks) {
-      o(this.node);
-    }
-  };
-
-  get root() {
-    return this.node;
-  }
-
-  resize() {
-    // dummy
+  get node() {
+    return this.root;
   }
 
   setViewport() {
     // dummy
-  }
-
-  remove() {
-    this.root.remove();
   }
 }

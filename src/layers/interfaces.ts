@@ -7,7 +7,7 @@ export interface ILayerElement {
 }
 
 export interface ILayerImpl {
-  readonly root: HTMLElement | SVGSVGElement;
+  readonly root: HTMLElement | SVGElement;
   resize(width: number, height: number): void;
   remove(): void;
   setViewport(tx: number, ty: number, zoom: number): void;
