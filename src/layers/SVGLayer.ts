@@ -1,4 +1,5 @@
-import { ADOMBaseLayer, ILayerAdapter } from './ABaseLayer';
+import { ILayerAdapter } from './ABaseLayer';
+import { ADOMBaseLayer } from './ADOMBaseLayer';
 import { ILayerElement, ILayerImpl, ISVGLayer, ISVGStaticLayer } from './interfaces';
 
 export const SVG_NS = 'http://www.w3.org/2000/svg';

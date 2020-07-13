@@ -1,4 +1,5 @@
-import { ADOMBaseLayer, ILayerAdapter } from './ABaseLayer';
+import { ILayerAdapter } from './ABaseLayer';
+import { ADOMBaseLayer } from './ADOMBaseLayer';
 import { IHTMLLayer, IHTMLStaticLayer, ILayerElement, ILayerImpl } from './interfaces';
 
 export class HTMLLayer extends ADOMBaseLayer<HTMLElement> implements IHTMLLayer, ILayerImpl {
