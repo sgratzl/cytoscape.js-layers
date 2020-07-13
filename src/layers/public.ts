@@ -40,7 +40,15 @@ export interface ICustomLayer extends IMoveAbleLayer {
   update(): void;
 }
 
-export interface ISVGLayer extends ICustomLayer {
+export interface ITransformedLayer extends ICustomLayer {
+  /**
+   * checks whether the given point in model coordinates is visible i.e., within the visible rendered bounds
+   * @param point
+   */
+  isVisible(point: { x: number; y: number } | cy.BoundingBox12): boolean;
+}
+
+export interface ISVGLayer extends ITransformedLayer {
   readonly type: 'svg';
   readonly node: SVGElement;
 
@@ -55,8 +63,7 @@ export interface ISVGStaticLayer extends ICustomLayer {
   readonly callbacks: ISVGNodeUpdateFunction[];
   callback(callback: ISVGNodeUpdateFunction): ISVGStaticLayer;
 }
-
-export interface ICanvasLayer extends ICustomLayer {
+export interface ICanvasLayer extends ITransformedLayer {
   readonly type: 'canvas';
 
   readonly callbacks: IRenderFunction[];
@@ -70,7 +77,7 @@ export interface ICanvasStaticLayer extends ICustomLayer {
   callback(callback: IRenderFunction): ICanvasStaticLayer;
 }
 
-export interface IHTMLLayer extends ICustomLayer {
+export interface IHTMLLayer extends ITransformedLayer {
   readonly type: 'html';
   readonly node: HTMLElement;
 

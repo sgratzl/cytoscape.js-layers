@@ -18,12 +18,17 @@ export interface ILayerAdapter {
     layer: IMoveAbleLayer,
     type: 'svg' | 'html' | 'canvas' | 'svg-static' | 'html-static' | 'canvas-static'
   ): ILayer;
+  isVisible(p: { x: number; y: number } | cy.BoundingBox12): boolean;
 }
 
 export abstract class ABaseLayer implements IMoveAbleLayer {
   private updateOnRenderEnabled = false;
 
   constructor(private readonly adapter: ILayerAdapter) {}
+
+  isVisible(p: { x: number; y: number } | cy.BoundingBox12) {
+    return this.adapter.isVisible(p);
+  }
 
   get updateOnRender() {
     return this.updateOnRenderEnabled;

@@ -1,15 +1,52 @@
 import cy from 'cytoscape';
 
-export function matchNodes<T extends HTMLElement | SVGElement>(root: T, nodes: cy.NodeCollection, factory: () => T) {
-  // match
+export function matchNodes<T extends HTMLElement | SVGElement>(
+  root: T,
+  nodes: cy.NodeCollection,
+  options: {
+    bb: (node: cy.NodeSingular) => cy.BoundingBox12 & cy.BoundingBoxWH;
+    isVisible: (bb: cy.BoundingBox12 & cy.BoundingBoxWH) => boolean;
+    enter: (node: cy.NodeSingular, bb: cy.BoundingBox12 & cy.BoundingBoxWH) => T;
+    update: (elem: T, node: cy.NodeSingular, bb: cy.BoundingBox12 & cy.BoundingBoxWH) => void;
+    uniqueElements: boolean;
+  }
+) {
   const arr = Array.from(root.children) as T[];
+  if (!options.uniqueElements) {
+    nodes.forEach((node) => {
+      const bb = options.bb(node);
+      if (!options.isVisible(bb)) {
+        return;
+      }
+      if (arr.length > 0) {
+        options.update(arr.shift()!, node, bb);
+      } else {
+        const elem = options.enter(node, bb);
+        root.appendChild(elem);
+        options.update(arr.shift()!, node, bb);
+      }
+    });
+    for (const rest of arr) {
+      rest.remove();
+    }
+    return;
+  }
+  // match
   const map = new Map(arr.map((d) => [d.dataset.id!, d] as [string, T]));
-  nodes.forEach((node, i) => {
+
+  let i = -1;
+  nodes.forEach((node) => {
+    const bb = options.bb(node);
+    if (!options.isVisible(bb)) {
+      return;
+    }
+    i++;
     const id = node.id();
     const expected = arr[i];
     const has = map.get(id);
     let n: T;
     if (has) {
+      options.update(has, node, bb);
       map.delete(id);
       if (expected === has) {
         // match 1:1
@@ -18,8 +55,9 @@ export function matchNodes<T extends HTMLElement | SVGElement>(root: T, nodes: c
       n = has;
     } else {
       // need a new one
-      n = factory();
+      n = options.enter(node, bb);
       n.dataset.id = id;
+      options.update(n, node, bb);
     }
 
     if (i === 0) {

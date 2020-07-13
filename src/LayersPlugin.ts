@@ -26,6 +26,10 @@ import {
 import { ILayerAdapter } from './layers/ABaseLayer';
 import { renderPerEdge, renderPerNode } from './elements';
 
+function isPoint(p: { x: number; y: number } | cy.BoundingBox12): p is { x: number; y: number } {
+  return (p as { x: number; y: number }).x != null;
+}
+
 export default class LayersPlugin {
   readonly cy: cy.Core;
 
@@ -35,6 +39,8 @@ export default class LayersPlugin {
 
   private readonly adapter: ILayerAdapter;
 
+  private readonly viewport: { width: number; height: number; tx: number; ty: number; zoom: number };
+
   constructor(cy: cy.Core) {
     this.cy = cy;
     this.adapter = {
@@ -42,6 +48,28 @@ export default class LayersPlugin {
       insert: (where: 'before' | 'after', layer: IMoveAbleLayer, type) =>
         this.insert(where, layer as ILayer & ILayerImpl, type),
       move: (layer: IMoveAbleLayer, offset) => this.move(layer as ILayer & ILayerImpl, offset),
+      isVisible: (p: { x: number; y: number } | cy.BoundingBox12) => {
+        const v = this.viewport;
+        const inX = (x: number) => {
+          const xp = x * v.zoom + v.tx;
+          return xp >= 0 && xp <= v.width;
+        };
+        const inY = (y: number) => {
+          const yp = y * v.zoom + v.ty;
+          return yp >= 0 && yp <= v.height;
+        };
+        if (isPoint(p)) {
+          return inX(p.x) && inY(p.y);
+        }
+        // any of the four corners or the center are inside
+        return (
+          (inX(p.x1) && inY(p.y1)) ||
+          (inX(p.x2) && inY(p.y1)) ||
+          (inX(p.x2) && inY(p.y2)) ||
+          (inX(p.x1) && inY(p.y2)) ||
+          (inX((p.x1 + p.x2) / 2) && inY((p.y1 + p.y2) / 2))
+        );
+      },
     };
 
     const container = cy.container()!;
@@ -73,6 +101,14 @@ export default class LayersPlugin {
     cy.on('viewport', this.zoomed);
     cy.on('resize', this.resize);
     cy.on('destroy', this.destroy);
+
+    this.viewport = {
+      width: this.cy.width(),
+      height: this.cy.height(),
+      tx: this.cy.pan().x,
+      ty: this.cy.pan().y,
+      zoom: this.cy.zoom(),
+    };
   }
 
   private move(layer: ILayer & ILayerImpl, offset: number) {
@@ -110,6 +146,8 @@ export default class LayersPlugin {
   private readonly resize = () => {
     const width = this.cy.width();
     const height = this.cy.height();
+    this.viewport.width = width;
+    this.viewport.height = height;
 
     for (const layer of this.layers) {
       layer.resize(width, height);
@@ -130,16 +168,18 @@ export default class LayersPlugin {
   private readonly zoomed = () => {
     const pan = this.cy.pan();
     const zoom = this.cy.zoom();
+    this.viewport.tx = pan.x;
+    this.viewport.ty = pan.y;
+    this.viewport.zoom = zoom;
+
     for (const layer of this.layers) {
       layer.setViewport(pan.x, pan.y, zoom);
     }
   };
 
   private init<T extends ILayer & ILayerImpl>(layer: T): T {
-    layer.resize(this.cy.width(), this.cy.height());
-    const pan = this.cy.pan();
-    const zoom = this.cy.zoom();
-    layer.setViewport(pan.x, pan.y, zoom);
+    layer.resize(this.viewport.width, this.viewport.height);
+    layer.setViewport(this.viewport.tx, this.viewport.ty, this.viewport.zoom);
     return layer;
   }
 

@@ -1,18 +1,7 @@
 import cy from 'cytoscape';
 import { ICanvasLayer } from '../layers';
 import { ICallbackRemover, registerCallback } from './utils';
-
-export interface IEdgeLayerOption {
-  selector: string;
-  updateOn: 'render' | 'position' | 'auto';
-  queryEachTime: boolean;
-}
-
-const defaultOptions: IEdgeLayerOption = {
-  selector: ':visible',
-  updateOn: 'auto',
-  queryEachTime: false,
-};
+import { IElementLayerOptions, defaultElementLayerOptions } from './common';
 
 export interface IRenderPerEdgeResult extends ICallbackRemover {
   layer: ICanvasLayer;
@@ -22,15 +11,14 @@ export interface IRenderPerEdgeResult extends ICallbackRemover {
 export function renderPerEdge(
   layer: ICanvasLayer,
   render: (ctx: CanvasRenderingContext2D, node: cy.EdgeSingular, path: Path2D) => void,
-  options?: Partial<IEdgeLayerOption>
+  options?: Partial<IElementLayerOptions>
 ): IRenderPerEdgeResult {
-  const o = Object.assign({}, defaultOptions, options);
+  const o = Object.assign({}, defaultElementLayerOptions(options), options);
   const edges = o.queryEachTime ? layer.cy.collection() : layer.cy.edges(o.selector);
 
-  const autoRender = o.updateOn === 'auto' ? (o.queryEachTime ? 'render' : 'position') : o.updateOn;
-  if (autoRender === 'render') {
+  if (o.updateOn === 'render') {
     layer.updateOnRender = true;
-  } else if (autoRender === 'position') {
+  } else if (o.updateOn === 'position') {
     edges.on('position add remove', layer.update);
     edges.sources().on('position', layer.update);
     edges.targets().on('position', layer.update);
@@ -48,6 +36,14 @@ export function renderPerEdge(
         endX: number;
         endY: number;
       };
+      if (o.checkBounds) {
+        const s = impl ? { x: impl.startX, y: impl.startY } : edge.sourceEndpoint();
+        const t = impl ? { x: impl.endX, y: impl.endY } : edge.targetEndpoint();
+        if (!layer.isVisible(s) && !layer.isVisible(t)) {
+          // both outside
+          return;
+        }
+      }
       if (impl && impl.pathCache) {
         render(ctx, edge, impl.pathCache);
         return;
