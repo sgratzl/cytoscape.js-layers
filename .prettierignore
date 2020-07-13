@@ -1,2 +1,5 @@
 /.pnp.js
 /.yarnrc.yml
+*.map
+samples/*.js
+src/**/*.js
