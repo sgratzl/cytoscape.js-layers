@@ -9,6 +9,7 @@ export class SVGLayer extends ABaseLayer implements ISVGLayer, ILayerImpl {
   readonly node: SVGGElement & ILayerElement;
   readonly root: SVGSVGElement & ILayerElement;
   readonly callbacks: ISVGNodeUpdateFunction[] = [];
+  updateOnTransform = false;
 
   constructor(adapter: ILayerAdapter, doc: Document) {
     super(adapter);
@@ -37,6 +38,9 @@ export class SVGLayer extends ABaseLayer implements ISVGLayer, ILayerImpl {
 
   setViewport(tx: number, ty: number, zoom: number) {
     this.node.setAttribute('transform', `translate(${tx},${ty})scale(${zoom})`);
+    if (this.updateOnTransform) {
+      this.update();
+    }
   }
 
   remove() {

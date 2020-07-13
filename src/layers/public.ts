@@ -51,6 +51,7 @@ export interface ITransformedLayer extends ICustomLayer {
 export interface ISVGLayer extends ITransformedLayer {
   readonly type: 'svg';
   readonly node: SVGElement;
+  updateOnTransform: boolean;
 
   readonly callbacks: ISVGNodeUpdateFunction[];
   callback(callback: ISVGNodeUpdateFunction): ISVGLayer;
@@ -80,6 +81,7 @@ export interface ICanvasStaticLayer extends ICustomLayer {
 export interface IHTMLLayer extends ITransformedLayer {
   readonly type: 'html';
   readonly node: HTMLElement;
+  updateOnTransform: boolean;
 
   readonly callbacks: INodeUpdateFunction[];
   callback(callback: INodeUpdateFunction): IHTMLLayer;

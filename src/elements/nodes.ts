@@ -98,6 +98,9 @@ export function renderPerNode(
     isVisible: o.checkBounds ? (bb: cy.BoundingBox12 & cy.BoundingBoxWH) => layer.isVisible(bb) : () => true,
     uniqueElements: o.uniqueElements === true,
   };
+  if (o.checkBounds) {
+    layer.updateOnTransform = true;
+  }
 
   if (layer.type === 'html') {
     const matchOptions: IMatchOptions<HTMLElement> = {

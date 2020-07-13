@@ -7,6 +7,7 @@ export class HTMLLayer extends ABaseLayer implements IHTMLLayer, ILayerImpl {
   readonly node: HTMLDivElement & ILayerElement;
   readonly root: HTMLElement & ILayerElement;
   readonly callbacks: INodeUpdateFunction[] = [];
+  updateOnTransform = false;
 
   constructor(adapter: ILayerAdapter, doc: Document) {
     super(adapter);
@@ -40,6 +41,9 @@ export class HTMLLayer extends ABaseLayer implements IHTMLLayer, ILayerImpl {
 
   setViewport(tx: number, ty: number, zoom: number) {
     this.node.style.transform = `translate(${tx}px,${ty}px)scale(${zoom})`;
+    if (this.updateOnTransform) {
+      this.update();
+    }
   }
 
   remove() {
