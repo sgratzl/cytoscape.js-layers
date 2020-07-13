@@ -1,18 +1,15 @@
 import { ILayerElement } from './interfaces';
-import { IDOMUpdateFunction, ILayerOptions } from './public';
-import { layerStyle, stopClicks } from './utils';
+import { IDOMUpdateFunction } from './public';
+import { layerStyle } from './utils';
 import { ABaseLayer, ILayerAdapter } from './ABaseLayer';
 
 export abstract class ADOMBaseLayer<T extends HTMLElement | SVGElement> extends ABaseLayer {
   readonly root: T & ILayerElement;
   readonly callbacks: IDOMUpdateFunction<T>[] = [];
 
-  constructor(adapter: ILayerAdapter, root: T, options: ILayerOptions = {}) {
+  constructor(adapter: ILayerAdapter, root: T) {
     super(adapter);
     this.root = (root as unknown) as T & ILayerElement;
-    if (options.stopClicks) {
-      stopClicks(this.root);
-    }
     Object.assign(this.root.style, layerStyle);
   }
 

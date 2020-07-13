@@ -16,8 +16,14 @@ namespace CXTMenu {
       },
     ],
   });
+
   const layers = CytoscapeLayers.layers(cy);
-  const menuLayer = layers.append('svg-static');
+
+  const menuLayer = layers.append('svg-static', {
+    stopClicks: true,
+  });
+  menuLayer.node.classList.add('menuItems');
+
   const menuItems = ['A', 'B', 'C'];
   for (const item of menuItems) {
     menuLayer.node.insertAdjacentHTML(
@@ -29,7 +35,9 @@ namespace CXTMenu {
     </g>`
     );
     const g = menuLayer.node.lastElementChild! as SVGElement;
-    g.addEventListener('click', () => {
+    g.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.stopImmediatePropagation();
       console.log('clicked', item);
     });
   }
@@ -61,6 +69,8 @@ namespace CXTMenu {
     menuLayer.node.setAttribute('transform', `translate(${pos.x}, ${pos.y})`);
   }
 
+  menuLayer.node.style.opacity = '0';
+
   cy.on('select', 'node', (e) => {
     const node = e.target as cytoscape.NodeSingular;
     if (currentSelection) {
@@ -69,6 +79,7 @@ namespace CXTMenu {
     currentSelection = node;
     updatePos(e);
     currentSelection.on('position', updatePos);
+
     const pos = node.renderedPosition();
     menuLayer.node.setAttribute('transform', `translate(${pos.x}, ${pos.y})`);
     const innerRadius = Math.max(node.renderedWidth(), node.renderedHeight()) / 2;
@@ -84,13 +95,13 @@ namespace CXTMenu {
       text.setAttribute('x', r(Math.cos(labelAngle) * labelRadius).toString());
       text.setAttribute('y', r(Math.sin(labelAngle) * labelRadius).toString());
     });
-    menuLayer.show();
+    menuLayer.node.style.opacity = '1';
   });
-  cy.on('deselect', 'node', () => {
+  cy.on('unselect', 'node', () => {
     if (currentSelection) {
       currentSelection.off('position', undefined, updatePos);
     }
     currentSelection = null;
-    menuLayer.hide();
+    menuLayer.node.style.opacity = '0';
   });
 }

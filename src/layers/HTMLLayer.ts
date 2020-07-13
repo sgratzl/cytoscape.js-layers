@@ -2,6 +2,7 @@ import { ILayerAdapter } from './ABaseLayer';
 import { ADOMBaseLayer } from './ADOMBaseLayer';
 import { IHTMLLayer, IHTMLStaticLayer, ILayerElement, ILayerImpl } from './interfaces';
 import { IHTMLLayerOptions } from './public';
+import { stopClicks } from './utils';
 
 export class HTMLLayer extends ADOMBaseLayer<HTMLElement> implements IHTMLLayer, ILayerImpl {
   readonly type = 'html';
@@ -9,7 +10,7 @@ export class HTMLLayer extends ADOMBaseLayer<HTMLElement> implements IHTMLLayer,
   updateOnTransform = false;
 
   constructor(adapter: ILayerAdapter, doc: Document, options: IHTMLLayerOptions = {}) {
-    super(adapter, doc.createElement('div'), options);
+    super(adapter, doc.createElement('div'));
     this.root.__cy_layer = this;
     this.node = (doc.createElement('div') as unknown) as HTMLDivElement & ILayerElement;
     this.node.__cy_layer = this;
@@ -17,6 +18,9 @@ export class HTMLLayer extends ADOMBaseLayer<HTMLElement> implements IHTMLLayer,
     this.node.style.left = '0px';
     this.node.style.top = '0px';
     this.root.appendChild(this.node);
+    if (options.stopClicks) {
+      stopClicks(this.node);
+    }
   }
 
   setViewport(tx: number, ty: number, zoom: number) {
@@ -31,8 +35,11 @@ export class HTMLStaticLayer extends ADOMBaseLayer<HTMLElement> implements IHTML
   readonly type = 'html-static';
 
   constructor(adapter: ILayerAdapter, doc: Document, options: IHTMLLayerOptions = {}) {
-    super(adapter, doc.createElement('div'), options);
+    super(adapter, doc.createElement('div'));
     this.node.__cy_layer = this;
+    if (options.stopClicks) {
+      stopClicks(this.node);
+    }
   }
 
   get node() {

@@ -9,16 +9,24 @@
         display: block;
       }
 
+      .menuItems {
+        opacity: 1;
+        transition: opacity 0.5s ease;
+      }
       .menuItem > text {
         fill: white;
+        transition: all 0.5s ease;
       }
       .menuItem > path {
-        fill: #0e0e0e;
+        fill: #504f4f;
         stroke: white;
+        transition: all 0.5s ease;
+      }
+      .menuItem:hover {
+        transform: scale(1.1);
       }
       .menuItem:hover > path {
         fill: black;
-        stroke: black;
       }
     </style>
   </head>
