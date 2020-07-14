@@ -1,5 +1,10 @@
 import cy from 'cytoscape';
 
+export interface IPoint {
+  x: number;
+  y: number;
+}
+
 export interface IRenderFunction {
   (ctx: CanvasRenderingContext2D): void;
 }
@@ -54,7 +59,7 @@ export interface ITransformedLayer extends ICustomLayer {
    * checks whether the given point in model coordinates is visible i.e., within the visible rendered bounds
    * @param point
    */
-  inVisibleBounds(point: { x: number; y: number } | cy.BoundingBox12): boolean;
+  inVisibleBounds(point: IPoint | cy.BoundingBox12): boolean;
 }
 
 export interface ISVGLayer extends ITransformedLayer {

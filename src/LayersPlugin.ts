@@ -25,12 +25,13 @@ import {
   IHTMLLayerOptions,
   ISVGLayerOptions,
   ICanvasLayerOptions,
+  IPoint,
 } from './layers';
 import { ILayerAdapter } from './layers/ABaseLayer';
 import { renderPerEdge, renderPerNode } from './elements';
 
-function isPoint(p: { x: number; y: number } | cy.BoundingBox12): p is { x: number; y: number } {
-  return (p as { x: number; y: number }).x != null;
+function isPoint(p: IPoint | cy.BoundingBox12): p is IPoint {
+  return (p as IPoint).x != null;
 }
 
 export default class LayersPlugin {
@@ -51,7 +52,7 @@ export default class LayersPlugin {
       insert: (where: 'before' | 'after', layer: IMoveAbleLayer, type) =>
         this.insert(where, layer as ILayer & ILayerImpl, type),
       move: (layer: IMoveAbleLayer, offset) => this.move(layer as ILayer & ILayerImpl, offset),
-      inVisibleBounds: (p: { x: number; y: number } | cy.BoundingBox12) => {
+      inVisibleBounds: (p: IPoint | cy.BoundingBox12) => {
         const v = this.viewport;
         const inX = (x: number) => {
           const xp = x * v.zoom + v.tx;
