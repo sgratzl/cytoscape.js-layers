@@ -51,7 +51,31 @@ layers.renderPerEdge(layers.append('canvas'), (ctx, edge, path) => {
 });
 ```
 
-## API
+## Usage Examples
+
+### Annotation
+
+render a bar and a histogram below each node
+
+Code: [annotation](./samples/annotation.ts)
+
+![image](https://user-images.githubusercontent.com/4129778/87443573-f79ad400-c5f5-11ea-91c7-db327e6278ff.png)
+
+### Circular Context Menu
+
+similar to Cytoscape Cxtmenu extension.
+
+Code: [ctxmenu](./samples/ctxmenu.ts)
+
+![image](https://user-images.githubusercontent.com/4129778/87440945-d4baf080-c5f2-11ea-96de-6a062132ea81.png)
+
+### HTML Label
+
+similar to Cytoscape HTML Node Label extension
+
+Code: [node-html-label](./samples/node-html-label.ts)
+
+![image](https://user-images.githubusercontent.com/4129778/87441059-f2885580-c5f2-11ea-9f6e-6af9e66c8831.png)
 
 ## Development Environment
 
