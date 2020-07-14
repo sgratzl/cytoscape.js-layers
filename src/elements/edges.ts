@@ -1,5 +1,5 @@
 import cy from 'cytoscape';
-import { ICanvasLayer } from '../layers';
+import { ICanvasLayer, IPoint } from '../layers';
 import { ICallbackRemover, registerCallback } from './utils';
 import { IElementLayerOptions, defaultElementLayerOptions } from './common';
 
@@ -8,12 +8,22 @@ export interface IRenderPerEdgeResult extends ICallbackRemover {
   edges: cy.EdgeCollection;
 }
 
+export interface IEdgeLayerOptions extends IElementLayerOptions {
+  checkBoundsPointCount: number;
+}
+
 export function renderPerEdge(
   layer: ICanvasLayer,
-  render: (ctx: CanvasRenderingContext2D, node: cy.EdgeSingular, path: Path2D) => void,
-  options?: Partial<IElementLayerOptions>
+  render: (ctx: CanvasRenderingContext2D, edge: cy.EdgeSingular, path: Path2D, start: IPoint, end: IPoint) => void,
+  options?: Partial<IEdgeLayerOptions>
 ): IRenderPerEdgeResult {
-  const o = Object.assign({}, defaultElementLayerOptions(options), options);
+  const o: IEdgeLayerOptions = Object.assign(
+    {
+      checkBoundsPointCount: 5,
+    },
+    defaultElementLayerOptions(options),
+    options
+  );
   const edges = o.queryEachTime ? layer.cy.collection() : layer.cy.edges(o.selector);
 
   if (o.updateOn === 'render') {
@@ -31,34 +41,26 @@ export function renderPerEdge(
     currentEdges.forEach((edge) => {
       const impl = (edge as any)._private.rscratch as {
         pathCache: Path2D;
-        startX: number;
-        startY: number;
-        endX: number;
-        endY: number;
+        startX?: number;
+        startY?: number;
+        endX?: number;
+        endY?: number;
       };
-      if (o.checkBounds) {
-        const s = impl ? { x: impl.startX, y: impl.startY } : edge.sourceEndpoint();
-        const t = impl ? { x: impl.endX, y: impl.endY } : edge.targetEndpoint();
-        if (!layer.inVisibleBounds(s) && !layer.inVisibleBounds(t)) {
-          // both outside
-          return;
-        }
+      const s =
+        impl && impl.startX != null && impl.startY != null ? { x: impl.startX, y: impl.startY } : edge.sourceEndpoint();
+      const t = impl && impl.endX != null && impl.endY != null ? { x: impl.endX, y: impl.endY } : edge.targetEndpoint();
+
+      if (o.checkBounds && o.checkBoundsPointCount > 0 && !anyVisible(layer, s, t, o.checkBoundsPointCount)) {
+        return;
       }
       if (impl && impl.pathCache) {
-        render(ctx, edge, impl.pathCache);
+        render(ctx, edge, impl.pathCache, s, t);
         return;
       }
       const path = new Path2D();
-      if (impl) {
-        path.moveTo(impl.startX, impl.startY);
-        path.lineTo(impl.endX, impl.endY);
-      } else {
-        const s = edge.sourceEndpoint();
-        const t = edge.targetEndpoint();
-        path.moveTo(s.x, s.y);
-        path.lineTo(t.x, t.y);
-      }
-      render(ctx, edge, new Path2D());
+      path.moveTo(s.x, s.y);
+      path.lineTo(t.x, t.y);
+      render(ctx, edge, path, s, t);
     });
   };
 
@@ -73,4 +75,21 @@ export function renderPerEdge(
       r.remove();
     },
   };
+}
+
+function anyVisible(layer: ICanvasLayer, s: IPoint, t: IPoint, count: number) {
+  const interpolate = (v: number) => ({
+    x: s.x * v + t.x * (1 - v),
+    y: s.y * v + t.y * (1 - v),
+  });
+  if (count === 1) {
+    return layer.inVisibleBounds(interpolate(0.5));
+  }
+  const step = 1 / count;
+  for (let i = 0; i <= count; i++) {
+    if (layer.inVisibleBounds(interpolate(i * step))) {
+      return true;
+    }
+  }
+  return false;
 }
