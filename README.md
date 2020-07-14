@@ -61,6 +61,14 @@ Code: [annotation](./samples/annotation.ts)
 
 ![image](https://user-images.githubusercontent.com/4129778/87443573-f79ad400-c5f5-11ea-91c7-db327e6278ff.png)
 
+### Edge Animations
+
+using a animated linear gradient to animate edges in a separate layer
+
+Code: [animatedEdges](./samples/animatedEdges.ts)
+
+![animated edges](https://user-images.githubusercontent.com/4129778/87443931-70019500-c5f6-11ea-8671-ff6e2a829fa3.gif)
+
 ### Circular Context Menu
 
 similar to Cytoscape Cxtmenu extension.
