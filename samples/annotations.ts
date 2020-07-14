@@ -1,4 +1,4 @@
-namespace Annotations {
+export namespace Annotations {
   declare const cytoscape: typeof import('cytoscape');
   declare const CytoscapeLayers: typeof import('../dist');
 
