@@ -2667,7 +2667,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"babel-eslint@npm:^10.0.3":
+"babel-eslint@npm:*, babel-eslint@npm:^10.0.3":
   version: 10.1.0
   resolution: "babel-eslint@npm:10.1.0"
   dependencies:
