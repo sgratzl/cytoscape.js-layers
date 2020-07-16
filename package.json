@@ -48,7 +48,6 @@
     "@typescript-eslint/eslint-plugin": "^3.6.1",
     "@typescript-eslint/parser": "^3.6.1",
     "@yarnpkg/pnpify": "^2.1.0",
-    "bubblesets-js": "^2.2.0",
     "cytoscape": "^3.15.2",
     "eslint": "^7.4.0",
     "eslint-config-prettier": "^6.11.0",
