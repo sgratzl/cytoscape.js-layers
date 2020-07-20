@@ -13,6 +13,11 @@ export interface INodeLayerOption extends IElementLayerOptions {
    * where to position the canvas / node relative to a node
    */
   position: 'none' | 'top-left' | 'center';
+  /**
+   * init function for the collection
+   * @param nodes
+   */
+  initCollection(nodes: cy.NodeCollection): void;
 }
 
 export interface INodeDOMLayerOption<T extends HTMLElement | SVGElement> extends INodeLayerOption {
@@ -27,6 +32,7 @@ export interface INodeDOMLayerOption<T extends HTMLElement | SVGElement> extends
    * @param node
    */
   init(elem: T, node: cy.NodeSingular, bb: cy.BoundingBox12 & cy.BoundingBoxWH): void;
+
   /**
    * additional transform to apply to a node
    */
@@ -76,11 +82,15 @@ export function renderPerNode(
         includeOverlays: false,
       },
       uniqueElements: false,
+      initCollection: () => undefined,
     },
     defaultElementLayerOptions(options),
     options
   );
   const nodes = o.queryEachTime ? layer.cy.collection() : layer.cy.nodes(o.selector);
+  if (!o.queryEachTime) {
+    o.initCollection(nodes);
+  }
   if (o.updateOn === 'render') {
     layer.updateOnRender = true;
   } else if (o.updateOn === 'position') {
@@ -89,7 +99,7 @@ export function renderPerNode(
     nodes.on('add remove', layer.update);
   }
 
-  const re = (v: ICallbackRemover): IRenderPerNodeResult => ({
+  const wrapResult = (v: ICallbackRemover): IRenderPerNodeResult => ({
     layer,
     nodes,
     remove: () => {
@@ -103,6 +113,9 @@ export function renderPerNode(
     const renderer = (ctx: CanvasRenderingContext2D) => {
       const t = ctx.getTransform();
       const currentNodes = oCanvas.queryEachTime ? layer.cy.nodes(oCanvas.selector) : nodes;
+      if (o.queryEachTime) {
+        o.initCollection(currentNodes);
+      }
       currentNodes.forEach((node) => {
         const bb = node.boundingBox(o.boundingBox);
         if (oCanvas.checkBounds && !layer.inVisibleBounds(bb)) {
@@ -120,7 +133,7 @@ export function renderPerNode(
         }
       });
     };
-    return re(registerCallback(layer, renderer));
+    return wrapResult(registerCallback(layer, renderer));
   }
 
   const oDOM = o as INodeDOMLayerOption<any>;
@@ -157,9 +170,12 @@ export function renderPerNode(
     };
     const renderer = (root: HTMLElement) => {
       const currentNodes = oDOM.queryEachTime ? layer.cy.nodes(oDOM.selector) : nodes;
+      if (o.queryEachTime) {
+        o.initCollection(currentNodes);
+      }
       matchNodes(root, currentNodes, matchOptions);
     };
-    return re(registerCallback(layer, renderer));
+    return wrapResult(registerCallback(layer, renderer));
   }
 
   // if (layer.type === 'svg') {
@@ -184,7 +200,10 @@ export function renderPerNode(
   };
   const renderer = (root: SVGElement) => {
     const currentNodes = oDOM.queryEachTime ? layer.cy.nodes(oDOM.selector) : nodes;
+    if (o.queryEachTime) {
+      o.initCollection(currentNodes);
+    }
     matchNodes(root, currentNodes, matchOptions);
   };
-  return re(registerCallback(layer, renderer));
+  return wrapResult(registerCallback(layer, renderer));
 }

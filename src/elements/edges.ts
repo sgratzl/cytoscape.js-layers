@@ -10,6 +10,11 @@ export interface IRenderPerEdgeResult extends ICallbackRemover {
 
 export interface IEdgeLayerOptions extends IElementLayerOptions {
   checkBoundsPointCount: number;
+  /**
+   * init function for the collection
+   * @param edges
+   */
+  initCollection(edges: cy.EdgeCollection): void;
 }
 
 export function renderPerEdge(
@@ -20,11 +25,15 @@ export function renderPerEdge(
   const o: IEdgeLayerOptions = Object.assign(
     {
       checkBoundsPointCount: 5,
+      initCollection: () => undefined,
     },
     defaultElementLayerOptions(options),
     options
   );
   const edges = o.queryEachTime ? layer.cy.collection() : layer.cy.edges(o.selector);
+  if (!o.queryEachTime) {
+    o.initCollection(edges);
+  }
 
   if (o.updateOn === 'render') {
     layer.updateOnRender = true;
@@ -38,6 +47,9 @@ export function renderPerEdge(
 
   const renderer = (ctx: CanvasRenderingContext2D) => {
     const currentEdges = o.queryEachTime ? layer.cy.edges(o.selector) : edges;
+    if (o.queryEachTime) {
+      o.initCollection(currentEdges);
+    }
     currentEdges.forEach((edge) => {
       const impl = (edge as any)._private.rscratch as {
         pathCache: Path2D;
