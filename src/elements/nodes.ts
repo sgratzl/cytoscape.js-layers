@@ -5,9 +5,14 @@ import { matchNodes, registerCallback, ICallbackRemover, IMatchOptions } from '.
 import { IElementLayerOptions, defaultElementLayerOptions } from './common';
 
 export interface INodeLayerOption extends IElementLayerOptions {
+  /**
+   * how to compute the bounding box
+   */
   boundingBox: cy.BoundingBoxOptions;
+  /**
+   * where to position the canvas / node relative to a node
+   */
   position: 'none' | 'top-left' | 'center';
-  transform?: string;
 }
 
 export interface INodeDOMLayerOption<T extends HTMLElement | SVGElement> extends INodeLayerOption {
@@ -22,6 +27,19 @@ export interface INodeDOMLayerOption<T extends HTMLElement | SVGElement> extends
    * @param node
    */
   init(elem: T, node: cy.NodeSingular, bb: cy.BoundingBox12 & cy.BoundingBoxWH): void;
+  /**
+   * additional transform to apply to a node
+   */
+  transform?: string;
+}
+
+export interface INodeCanvasLayerOption extends INodeLayerOption {
+  /**
+   * init function for newly added node
+   * @param elem
+   * @param node
+   */
+  init(node: cy.NodeSingular, bb: cy.BoundingBox12 & cy.BoundingBoxWH): void;
 }
 
 export interface IRenderPerNodeResult extends ICallbackRemover {
@@ -32,7 +50,7 @@ export interface IRenderPerNodeResult extends ICallbackRemover {
 export function renderPerNode(
   layer: ICanvasLayer,
   render: (ctx: CanvasRenderingContext2D, node: cy.NodeSingular, bb: cy.BoundingBox12 & cy.BoundingBoxWH) => void,
-  options?: Partial<INodeLayerOption>
+  options?: Partial<INodeCanvasLayerOption>
 ): IRenderPerNodeResult;
 export function renderPerNode(
   layer: IHTMLLayer,
@@ -47,7 +65,7 @@ export function renderPerNode(
 export function renderPerNode(
   layer: ICanvasLayer | IHTMLLayer | ISVGLayer,
   render: (ctx: any, node: cy.NodeSingular, bb: cy.BoundingBox12 & cy.BoundingBoxWH) => void,
-  options: Partial<INodeDOMLayerOption<any>> = {}
+  options: Partial<INodeDOMLayerOption<any> | INodeCanvasLayerOption> = {}
 ): IRenderPerNodeResult {
   const o = Object.assign(
     {
@@ -81,22 +99,23 @@ export function renderPerNode(
   });
 
   if (layer.type === 'canvas') {
+    const oCanvas = o as INodeCanvasLayerOption;
     const renderer = (ctx: CanvasRenderingContext2D) => {
       const t = ctx.getTransform();
-      const currentNodes = o.queryEachTime ? layer.cy.nodes(o.selector) : nodes;
+      const currentNodes = oCanvas.queryEachTime ? layer.cy.nodes(oCanvas.selector) : nodes;
       currentNodes.forEach((node) => {
         const bb = node.boundingBox(o.boundingBox);
-        if (o.checkBounds && !layer.inVisibleBounds(bb)) {
+        if (oCanvas.checkBounds && !layer.inVisibleBounds(bb)) {
           return;
         }
-        if (o.position === 'top-left') {
+        if (oCanvas.position === 'top-left') {
           ctx.translate(bb.x1, bb.y1);
-        } else if (o.position === 'center') {
+        } else if (oCanvas.position === 'center') {
           const pos = node.position();
           ctx.translate(pos.x, pos.y);
         }
         render(ctx, node, bb);
-        if (o.position !== 'none') {
+        if (oCanvas.position !== 'none') {
           ctx.setTransform(t);
         }
       });
@@ -104,13 +123,14 @@ export function renderPerNode(
     return re(registerCallback(layer, renderer));
   }
 
+  const oDOM = o as INodeDOMLayerOption<any>;
   // HTML or SVG
   const baseOptions = {
-    bb: (node: cy.NodeSingular) => node.boundingBox(o.boundingBox),
-    isVisible: o.checkBounds ? (bb: cy.BoundingBox12 & cy.BoundingBoxWH) => layer.inVisibleBounds(bb) : () => true,
-    uniqueElements: o.uniqueElements === true,
+    bb: (node: cy.NodeSingular) => node.boundingBox(oDOM.boundingBox),
+    isVisible: oDOM.checkBounds ? (bb: cy.BoundingBox12 & cy.BoundingBoxWH) => layer.inVisibleBounds(bb) : () => true,
+    uniqueElements: oDOM.uniqueElements === true,
   };
-  if (o.checkBounds) {
+  if (oDOM.checkBounds) {
     layer.updateOnTransform = true;
   }
 
@@ -120,23 +140,23 @@ export function renderPerNode(
       enter: (node: cy.NodeSingular, bb: cy.BoundingBox12 & cy.BoundingBoxWH) => {
         const r = layer.node.ownerDocument.createElement('div');
         r.style.position = 'absolute';
-        if (o.init) {
-          o.init(r, node, bb);
+        if (oDOM.init) {
+          oDOM.init(r, node, bb);
         }
         return r;
       },
       update: (elem, node, bb) => {
-        if (o.position === 'top-left') {
-          elem.style.transform = `${o.transform}translate(${bb.x1}px,${bb.y1}px)`;
-        } else if (o.position === 'center') {
+        if (oDOM.position === 'top-left') {
+          elem.style.transform = `${oDOM.transform}translate(${bb.x1}px,${bb.y1}px)`;
+        } else if (oDOM.position === 'center') {
           const pos = node.position();
-          elem.style.transform = `${o.transform}translate(${pos.x}px,${pos.y}px)`;
+          elem.style.transform = `${oDOM.transform}translate(${pos.x}px,${pos.y}px)`;
         }
         render(elem, node, bb);
       },
     };
     const renderer = (root: HTMLElement) => {
-      const currentNodes = o.queryEachTime ? layer.cy.nodes(o.selector) : nodes;
+      const currentNodes = oDOM.queryEachTime ? layer.cy.nodes(oDOM.selector) : nodes;
       matchNodes(root, currentNodes, matchOptions);
     };
     return re(registerCallback(layer, renderer));
@@ -147,23 +167,23 @@ export function renderPerNode(
     ...baseOptions,
     enter: (node: cy.NodeSingular, bb: cy.BoundingBox12 & cy.BoundingBoxWH) => {
       const r = layer.node.ownerDocument.createElementNS(SVG_NS, 'g');
-      if (o.init) {
-        o.init(r, node, bb);
+      if (oDOM.init) {
+        oDOM.init(r, node, bb);
       }
       return r;
     },
     update: (elem, node, bb) => {
-      if (o.position === 'top-left') {
-        elem.setAttribute('transform', `${o.transform}translate(${bb.x1},${bb.y1})`);
-      } else if (o.position === 'center') {
+      if (oDOM.position === 'top-left') {
+        elem.setAttribute('transform', `${oDOM.transform}translate(${bb.x1},${bb.y1})`);
+      } else if (oDOM.position === 'center') {
         const pos = node.position();
-        elem.setAttribute('transform', `${o.transform}translate(${pos.x},${pos.y})`);
+        elem.setAttribute('transform', `${oDOM.transform}translate(${pos.x},${pos.y})`);
       }
       render(elem, node, bb);
     },
   };
   const renderer = (root: SVGElement) => {
-    const currentNodes = o.queryEachTime ? layer.cy.nodes(o.selector) : nodes;
+    const currentNodes = oDOM.queryEachTime ? layer.cy.nodes(oDOM.selector) : nodes;
     matchNodes(root, currentNodes, matchOptions);
   };
   return re(registerCallback(layer, renderer));
