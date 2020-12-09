@@ -19,8 +19,8 @@ namespace EdgeTypes {
       {
         selector: 'edge',
         style: {
-          'line-color': 'white',
-          opacity: 0.01,
+          'line-color': 'black',
+          opacity: 0.5,
         },
       },
       {

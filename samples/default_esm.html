@@ -23,8 +23,8 @@
     </script>
     <script type="module-shim">
       import cytoscape from 'cytoscape';
-      import BubbleSets from 'cytoscape-layers';
-      cytoscape.use(BubbleSets);
+      import Layers from 'cytoscape-layers';
+      cytoscape.use(Layers);
 
       const cy = cytoscape({
         container: document.getElementById('app'),
@@ -40,9 +40,20 @@
           },
         ],
       });
-      cy.ready(() => {
-        const bb = cy.bubbleSets();
-        bb.addPath(cy.nodes(), cy.edges(), null);
+      const layers = cy.layers();
+      // layers.append('svg-static').node.innerHTML = `<text>TEST</text>`;
+      layers.nodeLayer.insertAfter('html-static').node.innerHTML = 'Static Test Label';
+
+      layers.renderPerNode(layers.append('canvas'), (ctx, node, bb) => {
+        ctx.strokeStyle = 'red';
+        ctx.strokeRect(0, 0, bb.w, bb.h);
+      });
+      layers.renderPerNode(layers.append('html'), (elem, node) => {
+        elem.textContent = node.id();
+      });
+      layers.renderPerEdge(layers.append('canvas'), (ctx, edge, path) => {
+        ctx.strokeStyle = 'red';
+        ctx.stroke(path);
       });
     </script>
   </body>
