@@ -1,5 +1,15 @@
 /.pnp.js
 /.yarnrc.yml
+/.yarn
+/build
+/docs
+/coverage
+/.gitattributes
+/.gitignore
+/.prettierignore
+/LICENSE
+/yarn.lock
+/.vscode
 *.map
 samples/*.js
 src/**/*.js

@@ -19,13 +19,21 @@ export class CytoscapeBaseLayer extends ABaseLayer implements ILayerImpl {
     return this.node;
   }
 
-  readonly update = () => {};
+  readonly update = () => {
+    // dummy
+  };
 
-  resize() {}
+  resize() {
+    // dummy
+  }
 
-  setViewport() {}
+  setViewport() {
+    // dummy
+  }
 
-  remove() {}
+  remove() {
+    // dummy
+  }
 }
 
 export class CytoscapeNodeLayer extends CytoscapeBaseLayer implements ICytoscapeNodeLayer {

@@ -44,7 +44,7 @@ export abstract class ABaseLayer implements IMoveAbleLayer {
     if (value) {
       this.cy.on('render', this.update);
     } else {
-      this.cy.off('render', undefined, this.update);
+      this.cy.off('render', this.update);
     }
   }
 

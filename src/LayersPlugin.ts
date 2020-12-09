@@ -163,9 +163,9 @@ export default class LayersPlugin {
       layer.remove();
     }
 
-    this.cy.off('destroy', undefined, this.destroy);
-    this.cy.off('viewport', undefined, this.zoomed);
-    this.cy.off('resize', undefined, this.resize);
+    this.cy.off('destroy', this.destroy);
+    this.cy.off('viewport', this.zoomed);
+    this.cy.off('resize', this.resize);
     this.cy.scratch('_layers', undefined);
   };
 

@@ -1,6 +1,6 @@
 # Cytoscape.js Layers Plugin
 
-[![NPM Package][npm-image]][npm-url] [![Github Actions][github-actions-image]][github-actions-url] [![Cytoscape Plugin][cytoscape-image]][cytoscape-url]
+[![License: MIT][mit-image]][mit-url] [![NPM Package][npm-image]][npm-url] [![Github Actions][github-actions-image]][github-actions-url] [![Cytoscape Plugin][cytoscape-image]][cytoscape-url]
 
 A [Cytoscape.js](https://js.cytoscape.org) plugin for easy rendering of different layers in SVG, HTML, or Canvas format.
 
@@ -108,6 +108,8 @@ yarn release
 yarn release:pre
 ```
 
+[mit-image]: https://img.shields.io/badge/License-MIT-yellow.svg
+[mit-url]: https://opensource.org/licenses/MIT
 [npm-image]: https://badge.fury.io/js/cytoscape-layers.svg
 [npm-url]: https://npmjs.org/package/cytoscape-layers
 [github-actions-image]: https://github.com/sgratzl/cytoscape.js-layers/workflows/ci/badge.svg
