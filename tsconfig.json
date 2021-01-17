@@ -34,13 +34,10 @@
   "typedocOptions": {
     "name": "TSLibrary",
     "out": "./docs",
-    "mode": "library",
     "theme": "minimal",
-    "excludeNotExported": true,
     "excludeExternals": true,
     "excludePrivate": true,
     "includeVersion": true,
     "hideGenerator": true,
-    "entryPoint": "\"index\""
   }
 }

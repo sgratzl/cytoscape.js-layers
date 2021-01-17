@@ -93,7 +93,7 @@
     "prettier": "prettier */** --check",
     "eslint": "eslint src --ext .ts,.tsx",
     "eslint:fix": "npm run eslint -- --fix",
-    "docs": "typedoc",
+    "docs": "typedoc src/index.ts",
     "prepare": "npm run build",
     "release": "release-it --disable-metrics --npm.skipChecks",
     "release:pre": "release-it --disable-metrics --npm.skipChecks --preRelease=alpha --npm.tag=next"
