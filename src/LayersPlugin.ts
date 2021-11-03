@@ -1,4 +1,4 @@
-import cy from 'cytoscape';
+import type cy from 'cytoscape';
 import {
   HTMLLayer,
   ICytoscapeDragLayer,
@@ -27,7 +27,7 @@ import {
   ICanvasLayerOptions,
   IPoint,
 } from './layers';
-import { ILayerAdapter } from './layers/ABaseLayer';
+import type { ILayerAdapter } from './layers/ABaseLayer';
 import { renderPerEdge, renderPerNode } from './elements';
 
 function isPoint(p: IPoint | cy.BoundingBox12): p is IPoint {

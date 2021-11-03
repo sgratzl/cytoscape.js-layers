@@ -1,7 +1,7 @@
-import { ICanvasLayer, ILayerElement, ILayerImpl, IRenderFunction, ICanvasStaticLayer } from './interfaces';
+import type { ICanvasLayer, ILayerElement, ILayerImpl, IRenderFunction, ICanvasStaticLayer } from './interfaces';
 import { layerStyle, stopClicks } from './utils';
 import { ABaseLayer, ILayerAdapter } from './ABaseLayer';
-import { ICanvasLayerOptions } from './public';
+import type { ICanvasLayerOptions } from './public';
 
 export class CanvasBaseLayer extends ABaseLayer implements ILayerImpl {
   readonly node: HTMLCanvasElement & ILayerElement;

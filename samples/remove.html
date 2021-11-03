@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Sample</title>
+    <style>
+      #app {
+        width: 600px;
+        height: 400px;
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app"></div>
+    <button id="btn">Click</button>
+    <script src="https://cdn.jsdelivr.net/npm/cytoscape"></script>
+    <script src="../build/index.umd.js"></script>
+    <script>
+      let elements= [
+          { data: { id: 'a' } },
+          { data: { id: 'b' } },
+          {
+            data: {
+              id: 'ab',
+              source: 'a',
+              target: 'b',
+            },
+          },
+        ]
+      for(let i=0;i<500;i++){
+        elements.push({data:{id:i}})
+      }
+      const cy = cytoscape({
+        container: document.getElementById('app'),
+        elements: elements,
+      });
+      const layers = cy.layers();
+
+    // layers.renderPerNode(layers.append('canvas'), (ctx, node, bb) => {
+    //   ctx.strokeStyle = 'red';
+    //   ctx.strokeRect(0, 0, bb.w, bb.h);
+    // });
+    layers.renderPerNode(layers.append('html'), (elem, node) => {
+      elem.textContent = node.id();
+      // xx
+    });
+    // layers.renderPerEdge(layers.append('canvas'), (ctx, edge, path) => {
+    //   ctx.strokeStyle = 'red';
+    //   ctx.stroke(path);
+    // });
+
+    document.querySelector('#btn').onclick=function(){
+      console.time('del')
+      cy.remove('node[id > 50]');
+      console.timeEnd('del')
+    }
+    </script>
+  </body>
+</html>

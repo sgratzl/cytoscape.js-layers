@@ -10,11 +10,22 @@ import fs from 'fs';
 
 const pkg = JSON.parse(fs.readFileSync('./package.json'));
 
+function resolveYear() {
+  // Extract copyrights from the LICENSE.
+  const license = fs.readFileSync('./LICENSE', 'utf-8').toString();
+  const matches = Array.from(license.matchAll(/\(c\) (\d+)/gm));
+  if (!matches || matches.length === 0) {
+    return 2021;
+  }
+  return matches[matches.length - 1][1];
+}
+const year = resolveYear();
+
 const banner = `/**
  * ${pkg.name}
  * ${pkg.homepage}
  *
- * Copyright (c) ${new Date().getFullYear()} ${pkg.author.name} <${pkg.author.email}>
+ * Copyright (c) ${year} ${pkg.author.name} <${pkg.author.email}>
  */
 `;
 
@@ -26,6 +37,7 @@ const watchOnly = ['umd'];
 const isDependency = (v) => Object.keys(pkg.dependencies || {}).some((e) => e === v || v.startsWith(e + '/'));
 const isPeerDependency = (v) => Object.keys(pkg.peerDependencies || {}).some((e) => e === v || v.startsWith(e + '/'));
 
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export default function Config(options) {
   const buildFormat = (format) => !options.watch || watchOnly.includes(format);
 
@@ -43,9 +55,12 @@ export default function Config(options) {
       resolve(),
       commonjs(),
       replace({
-        // eslint-disable-next-line no-undef
-        'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV) || 'production',
-        __VERSION__: JSON.stringify(pkg.version),
+        preventAssignment: true,
+        values: {
+          // eslint-disable-next-line no-undef
+          'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV) || 'production',
+          __VERSION__: JSON.stringify(pkg.version),
+        },
       }),
     ],
   };
@@ -97,6 +112,9 @@ export default function Config(options) {
       },
       plugins: [
         dts({
+          compilerOptions: {
+            removeComments: false,
+          },
           respectExternal: true,
         }),
       ],

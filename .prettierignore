@@ -1,4 +1,4 @@
-/.pnp.js
+/.pnp.cjs
 /.yarnrc.yml
 /.yarn
 /build
@@ -10,6 +10,7 @@
 /LICENSE
 /yarn.lock
 /.vscode
+*.tsbuildinfo
 *.map
 samples/*.js
 src/**/*.js

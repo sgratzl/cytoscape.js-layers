@@ -1,4 +1,4 @@
-import {
+import type {
   ICanvasLayer,
   IHTMLLayer,
   IMoveAbleLayer,
@@ -8,8 +8,8 @@ import {
   ISVGStaticLayer,
   ICanvasStaticLayer,
 } from './interfaces';
-import cy from 'cytoscape';
-import { ICanvasLayerOptions, ISVGLayerOptions, IHTMLLayerOptions } from './public';
+import type cy from 'cytoscape';
+import type { ICanvasLayerOptions, ISVGLayerOptions, IHTMLLayerOptions } from './public';
 
 export interface ILayerAdapter {
   cy: cy.Core;

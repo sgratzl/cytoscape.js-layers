@@ -8,7 +8,7 @@
     "sourceMap": true,
     "strict": true,
     "removeComments": true,
-    "importsNotUsedAsValues": "remove",
+    "importsNotUsedAsValues": "error",
     "experimentalDecorators": true,
     "forceConsistentCasingInFileNames": true,
     "strictBindCallApply": true,
@@ -34,10 +34,10 @@
   "typedocOptions": {
     "name": "TSLibrary",
     "out": "./docs",
-    "theme": "minimal",
+    "theme": "default",
     "excludeExternals": true,
     "excludePrivate": true,
     "includeVersion": true,
-    "hideGenerator": true,
+    "hideGenerator": true
   }
 }

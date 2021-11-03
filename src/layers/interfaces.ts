@@ -1,4 +1,4 @@
-import { ILayer } from './public';
+import type { ILayer } from './public';
 
 export * from './public';
 

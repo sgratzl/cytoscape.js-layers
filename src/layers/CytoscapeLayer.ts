@@ -1,5 +1,5 @@
 import { ABaseLayer, ILayerAdapter } from './ABaseLayer';
-import {
+import type {
   ICytoscapeDragLayer,
   ICytoscapeNodeLayer,
   ICytoscapeSelectBoxLayer,

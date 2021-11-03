@@ -1,7 +1,7 @@
-import { ILayerAdapter } from './ABaseLayer';
+import type { ILayerAdapter } from './ABaseLayer';
 import { ADOMBaseLayer } from './ADOMBaseLayer';
-import { ILayerElement, ILayerImpl, ISVGLayer, ISVGStaticLayer } from './interfaces';
-import { ISVGLayerOptions } from './public';
+import type { ILayerElement, ILayerImpl, ISVGLayer, ISVGStaticLayer } from './interfaces';
+import type { ISVGLayerOptions } from './public';
 import { stopClicks } from './utils';
 
 export const SVG_NS = 'http://www.w3.org/2000/svg';

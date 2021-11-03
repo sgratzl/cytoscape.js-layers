@@ -1,5 +1,5 @@
-import { ILayerElement } from './interfaces';
-import { IDOMUpdateFunction } from './public';
+import type { ILayerElement } from './interfaces';
+import type { IDOMUpdateFunction } from './public';
 import { layerStyle } from './utils';
 import { ABaseLayer, ILayerAdapter } from './ABaseLayer';
 

@@ -1,4 +1,4 @@
-import cy from 'cytoscape';
+import type cy from 'cytoscape';
 
 export interface IMatchOptions<T extends HTMLElement | SVGElement> {
   bb: (node: cy.NodeSingular) => cy.BoundingBox12 & cy.BoundingBoxWH;
