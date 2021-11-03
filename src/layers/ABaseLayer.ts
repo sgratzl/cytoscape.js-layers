@@ -57,12 +57,15 @@ export abstract class ABaseLayer implements IMoveAbleLayer {
   moveUp() {
     this.adapter.move(this, -1);
   }
+
   moveDown() {
     this.adapter.move(this, 1);
   }
+
   moveBack() {
     this.adapter.move(this, Number.NEGATIVE_INFINITY);
   }
+
   moveFront() {
     this.adapter.move(this, Number.POSITIVE_INFINITY);
   }

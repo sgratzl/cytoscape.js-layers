@@ -38,7 +38,9 @@ export default class LayersPlugin {
   readonly cy: cy.Core;
 
   readonly nodeLayer: ICytoscapeNodeLayer;
+
   readonly dragLayer: ICytoscapeDragLayer;
+
   readonly selectBoxLayer: ICytoscapeSelectBoxLayer;
 
   private readonly adapter: ILayerAdapter;
@@ -139,7 +141,7 @@ export default class LayersPlugin {
 
   private get layers(): readonly (ILayer & ILayerImpl)[] {
     return Array.from(this.root.children)
-      .map((d) => ((d as unknown) as ILayerElement).__cy_layer)
+      .map((d) => (d as unknown as ILayerElement).__cy_layer)
       .filter((d) => d != null);
   }
 
@@ -285,6 +287,7 @@ export default class LayersPlugin {
   }
 
   readonly renderPerEdge = renderPerEdge;
+
   readonly renderPerNode = renderPerNode;
 }
 

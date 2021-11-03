@@ -79,7 +79,7 @@
   "scripts": {
     "clean": "rimraf build node_modules \"*.tgz\" \"*.tsbuildinfo\" \"samples/*.js\" \"samples/*.map\"",
     "compile": "tsc -b tsconfig.c.json",
-    "start": "npm run watch",
+    "start": "yarn run watch",
     "watch": "rollup -c -w",
     "samples": "tsc -p samples/tsconfig.json",
     "samples:watch": "tsc -p samples/tsconfig.json -w",
@@ -87,13 +87,13 @@
     "test": "jest --passWithNoTests",
     "test:watch": "jest --passWithNoTests --watch",
     "test:coverage": "jest --passWithNoTests --coverage",
-    "lint": "npm run eslint && npm run prettier",
-    "fix": "npm run eslint:fix && npm run prettier:write",
+    "lint": "yarn run eslint && yarn run prettier",
+    "fix": "yarn run eslint:fix && yarn run prettier:write",
     "prettier:write": "prettier \"*\" \"*/**\" --write",
     "prettier": "prettier \"*\" \"*/**\" --check",
     "eslint": "eslint src --ext .ts,.tsx",
-    "eslint:fix": "npm run eslint -- --fix",
+    "eslint:fix": "yarn run eslint --fix",
     "docs": "typedoc src/index.ts",
-    "prepare": "npm run build"
+    "prepare": "yarn run build"
   }
 }

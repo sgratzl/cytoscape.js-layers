@@ -12,7 +12,7 @@ export class CytoscapeBaseLayer extends ABaseLayer implements ILayerImpl {
 
   constructor(adapter: ILayerAdapter, node: HTMLCanvasElement) {
     super(adapter);
-    this.node = (node as unknown) as HTMLCanvasElement & ILayerElement;
+    this.node = node as unknown as HTMLCanvasElement & ILayerElement;
   }
 
   get root() {

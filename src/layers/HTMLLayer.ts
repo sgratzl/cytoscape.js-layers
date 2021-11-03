@@ -6,13 +6,15 @@ import { stopClicks } from './utils';
 
 export class HTMLLayer extends ADOMBaseLayer<HTMLElement> implements IHTMLLayer, ILayerImpl {
   readonly type = 'html';
+
   readonly node: HTMLDivElement & ILayerElement;
+
   updateOnTransform = false;
 
   constructor(adapter: ILayerAdapter, doc: Document, options: IHTMLLayerOptions = {}) {
     super(adapter, doc.createElement('div'));
     this.root.__cy_layer = this;
-    this.node = (doc.createElement('div') as unknown) as HTMLDivElement & ILayerElement;
+    this.node = doc.createElement('div') as unknown as HTMLDivElement & ILayerElement;
     this.node.__cy_layer = this;
     this.node.style.position = 'absolute';
     this.node.style.left = '0px';
