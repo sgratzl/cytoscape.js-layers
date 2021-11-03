@@ -31,8 +31,8 @@
     "last 2 Chrome versions",
     "last 2 Firefox versions"
   ],
-  "module": "build/index.esm.js",
-  "main": "build/index.js",
+  "module": "build/index.js",
+  "main": "build/index.cjs.js",
   "browser": "build/index.umd.js",
   "unpkg": "build/index.umd.min.js",
   "jsdelivr": "build/index.umd.min.js",
