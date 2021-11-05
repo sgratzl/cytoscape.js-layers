@@ -52,6 +52,7 @@ export interface ICustomLayer extends IMoveAbleLayer {
 
   updateOnRender: boolean;
   update(): void;
+  updateOnRenderOnce(): void;
 }
 
 export interface ITransformedLayer extends ICustomLayer {

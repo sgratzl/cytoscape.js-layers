@@ -25,6 +25,7 @@ export interface ILayerAdapter {
 
 export abstract class ABaseLayer implements IMoveAbleLayer {
   private updateOnRenderEnabled = false;
+  private updateOnRenderOnceEnabled = false;
 
   constructor(private readonly adapter: ILayerAdapter) {}
 
@@ -46,6 +47,17 @@ export abstract class ABaseLayer implements IMoveAbleLayer {
     } else {
       this.cy.off('render', this.update);
     }
+  }
+
+  updateOnRenderOnce() {
+    if (this.updateOnRenderOnceEnabled) {
+      return;
+    }
+    this.updateOnRenderOnceEnabled = true;
+    this.cy.one('render', () => {
+      this.updateOnRenderOnceEnabled = false;
+      this.update();
+    });
   }
 
   abstract readonly update: () => void;
