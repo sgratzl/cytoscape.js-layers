@@ -2,7 +2,7 @@ name: Release Helper
 on:
   push:
     branches:
-      - main_disabled
+      - main
 
 jobs:
   correct_repository:
