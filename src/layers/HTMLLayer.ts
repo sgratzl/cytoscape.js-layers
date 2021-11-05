@@ -1,18 +1,20 @@
-import { ILayerAdapter } from './ABaseLayer';
+import type { ILayerAdapter } from './ABaseLayer';
 import { ADOMBaseLayer } from './ADOMBaseLayer';
-import { IHTMLLayer, IHTMLStaticLayer, ILayerElement, ILayerImpl } from './interfaces';
-import { IHTMLLayerOptions } from './public';
+import type { IHTMLLayer, IHTMLStaticLayer, ILayerElement, ILayerImpl } from './interfaces';
+import type { IHTMLLayerOptions } from './public';
 import { stopClicks } from './utils';
 
 export class HTMLLayer extends ADOMBaseLayer<HTMLElement> implements IHTMLLayer, ILayerImpl {
   readonly type = 'html';
+
   readonly node: HTMLDivElement & ILayerElement;
+
   updateOnTransform = false;
 
   constructor(adapter: ILayerAdapter, doc: Document, options: IHTMLLayerOptions = {}) {
     super(adapter, doc.createElement('div'));
     this.root.__cy_layer = this;
-    this.node = (doc.createElement('div') as unknown) as HTMLDivElement & ILayerElement;
+    this.node = doc.createElement('div') as unknown as HTMLDivElement & ILayerElement;
     this.node.__cy_layer = this;
     this.node.style.position = 'absolute';
     this.node.style.left = '0px';

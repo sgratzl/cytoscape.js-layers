@@ -1,6 +1,8 @@
+/* eslint-disable @typescript-eslint/no-namespace */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 namespace Annotations {
   declare const cytoscape: typeof import('cytoscape');
-  declare const CytoscapeLayers: typeof import('../dist');
+  declare const CytoscapeLayers: typeof import('../build');
 
   const cy = cytoscape({
     container: document.getElementById('app'),

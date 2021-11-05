@@ -1,15 +1,16 @@
-import { ILayerElement } from './interfaces';
-import { IDOMUpdateFunction } from './public';
+import type { ILayerElement } from './interfaces';
+import type { IDOMUpdateFunction } from './public';
 import { layerStyle } from './utils';
 import { ABaseLayer, ILayerAdapter } from './ABaseLayer';
 
 export abstract class ADOMBaseLayer<T extends HTMLElement | SVGElement> extends ABaseLayer {
   readonly root: T & ILayerElement;
+
   readonly callbacks: IDOMUpdateFunction<T>[] = [];
 
   constructor(adapter: ILayerAdapter, root: T) {
     super(adapter);
-    this.root = (root as unknown) as T & ILayerElement;
+    this.root = root as unknown as T & ILayerElement;
     Object.assign(this.root.style, layerStyle);
   }
 
@@ -26,7 +27,7 @@ export abstract class ADOMBaseLayer<T extends HTMLElement | SVGElement> extends 
   }
 
   set visible(value: boolean) {
-    if (this.visible == value) {
+    if (this.visible === value) {
       return;
     }
     this.root.style.display = value ? '' : 'none';
@@ -35,6 +36,7 @@ export abstract class ADOMBaseLayer<T extends HTMLElement | SVGElement> extends 
   show() {
     this.visible = true;
   }
+
   hide() {
     this.visible = false;
   }

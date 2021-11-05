@@ -1,13 +1,17 @@
-import { ICanvasLayer, ILayerElement, ILayerImpl, IRenderFunction, ICanvasStaticLayer } from './interfaces';
+import type { ICanvasLayer, ILayerElement, ILayerImpl, IRenderFunction, ICanvasStaticLayer } from './interfaces';
 import { layerStyle, stopClicks } from './utils';
 import { ABaseLayer, ILayerAdapter } from './ABaseLayer';
-import { ICanvasLayerOptions } from './public';
+import type { ICanvasLayerOptions } from './public';
 
 export class CanvasBaseLayer extends ABaseLayer implements ILayerImpl {
   readonly node: HTMLCanvasElement & ILayerElement;
+
   readonly ctx: CanvasRenderingContext2D;
+
   protected readonly pixelRatio: number;
+
   readonly callbacks: IRenderFunction[] = [];
+
   protected readonly transform: { tx: number; ty: number; zoom: number } = {
     tx: 0,
     ty: 0,
@@ -16,7 +20,7 @@ export class CanvasBaseLayer extends ABaseLayer implements ILayerImpl {
 
   constructor(adapter: ILayerAdapter, doc: Document, options: ICanvasLayerOptions = {}) {
     super(adapter);
-    this.node = (doc.createElement('canvas') as unknown) as HTMLCanvasElement & ILayerElement;
+    this.node = doc.createElement('canvas') as unknown as HTMLCanvasElement & ILayerElement;
     Object.assign(this.node.style, layerStyle);
     if (options.stopClicks) {
       stopClicks(this.node);
@@ -33,9 +37,11 @@ export class CanvasBaseLayer extends ABaseLayer implements ILayerImpl {
   set visible(value: boolean) {
     this.node.style.display = value ? '' : 'none';
   }
+
   show() {
     this.visible = true;
   }
+
   hide() {
     this.visible = false;
   }

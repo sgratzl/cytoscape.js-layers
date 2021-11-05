@@ -1,5 +1,5 @@
 import { ABaseLayer, ILayerAdapter } from './ABaseLayer';
-import {
+import type {
   ICytoscapeDragLayer,
   ICytoscapeNodeLayer,
   ICytoscapeSelectBoxLayer,
@@ -12,20 +12,28 @@ export class CytoscapeBaseLayer extends ABaseLayer implements ILayerImpl {
 
   constructor(adapter: ILayerAdapter, node: HTMLCanvasElement) {
     super(adapter);
-    this.node = (node as unknown) as HTMLCanvasElement & ILayerElement;
+    this.node = node as unknown as HTMLCanvasElement & ILayerElement;
   }
 
   get root() {
     return this.node;
   }
 
-  readonly update = () => {};
+  readonly update = () => {
+    // dummy
+  };
 
-  resize() {}
+  resize() {
+    // dummy
+  }
 
-  setViewport() {}
+  setViewport() {
+    // dummy
+  }
 
-  remove() {}
+  remove() {
+    // dummy
+  }
 }
 
 export class CytoscapeNodeLayer extends CytoscapeBaseLayer implements ICytoscapeNodeLayer {

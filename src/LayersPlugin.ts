@@ -1,4 +1,4 @@
-import cy from 'cytoscape';
+import type cy from 'cytoscape';
 import {
   HTMLLayer,
   ICytoscapeDragLayer,
@@ -27,7 +27,7 @@ import {
   ICanvasLayerOptions,
   IPoint,
 } from './layers';
-import { ILayerAdapter } from './layers/ABaseLayer';
+import type { ILayerAdapter } from './layers/ABaseLayer';
 import { renderPerEdge, renderPerNode } from './elements';
 
 function isPoint(p: IPoint | cy.BoundingBox12): p is IPoint {
@@ -38,7 +38,9 @@ export default class LayersPlugin {
   readonly cy: cy.Core;
 
   readonly nodeLayer: ICytoscapeNodeLayer;
+
   readonly dragLayer: ICytoscapeDragLayer;
+
   readonly selectBoxLayer: ICytoscapeSelectBoxLayer;
 
   private readonly adapter: ILayerAdapter;
@@ -139,7 +141,7 @@ export default class LayersPlugin {
 
   private get layers(): readonly (ILayer & ILayerImpl)[] {
     return Array.from(this.root.children)
-      .map((d) => ((d as unknown) as ILayerElement).__cy_layer)
+      .map((d) => (d as unknown as ILayerElement).__cy_layer)
       .filter((d) => d != null);
   }
 
@@ -163,9 +165,9 @@ export default class LayersPlugin {
       layer.remove();
     }
 
-    this.cy.off('destroy', undefined, this.destroy);
-    this.cy.off('viewport', undefined, this.zoomed);
-    this.cy.off('resize', undefined, this.resize);
+    this.cy.off('destroy', this.destroy);
+    this.cy.off('viewport', this.zoomed);
+    this.cy.off('resize', this.resize);
     this.cy.scratch('_layers', undefined);
   };
 
@@ -285,6 +287,7 @@ export default class LayersPlugin {
   }
 
   readonly renderPerEdge = renderPerEdge;
+
   readonly renderPerNode = renderPerNode;
 }
 

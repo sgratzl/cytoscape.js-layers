@@ -1,6 +1,8 @@
+/* eslint-disable @typescript-eslint/no-namespace */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 namespace EdgeTypes {
   declare const cytoscape: typeof import('cytoscape');
-  // declare const CytoscapeLayers: typeof import('../dist');
+  // declare const CytoscapeLayers: typeof import('../build');
 
   export const cy = cytoscape({
     container: document.getElementById('app'),
@@ -17,8 +19,8 @@ namespace EdgeTypes {
       {
         selector: 'edge',
         style: {
-          'line-color': 'white',
-          opacity: 0.01,
+          'line-color': 'black',
+          opacity: 0.5,
         },
       },
       {

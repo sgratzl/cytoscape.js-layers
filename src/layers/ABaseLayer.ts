@@ -1,4 +1,4 @@
-import {
+import type {
   ICanvasLayer,
   IHTMLLayer,
   IMoveAbleLayer,
@@ -8,8 +8,8 @@ import {
   ISVGStaticLayer,
   ICanvasStaticLayer,
 } from './interfaces';
-import cy from 'cytoscape';
-import { ICanvasLayerOptions, ISVGLayerOptions, IHTMLLayerOptions } from './public';
+import type cy from 'cytoscape';
+import type { ICanvasLayerOptions, ISVGLayerOptions, IHTMLLayerOptions } from './public';
 
 export interface ILayerAdapter {
   cy: cy.Core;
@@ -44,7 +44,7 @@ export abstract class ABaseLayer implements IMoveAbleLayer {
     if (value) {
       this.cy.on('render', this.update);
     } else {
-      this.cy.off('render', undefined, this.update);
+      this.cy.off('render', this.update);
     }
   }
 
@@ -57,12 +57,15 @@ export abstract class ABaseLayer implements IMoveAbleLayer {
   moveUp() {
     this.adapter.move(this, -1);
   }
+
   moveDown() {
     this.adapter.move(this, 1);
   }
+
   moveBack() {
     this.adapter.move(this, Number.NEGATIVE_INFINITY);
   }
+
   moveFront() {
     this.adapter.move(this, Number.POSITIVE_INFINITY);
   }

@@ -1,5 +1,5 @@
-import cy from 'cytoscape';
-import { ICanvasLayer, IPoint } from '../layers';
+import type cy from 'cytoscape';
+import type { ICanvasLayer, IPoint } from '../layers';
 import { ICallbackRemover, registerCallback } from './utils';
 import { IElementLayerOptions, defaultElementLayerOptions } from './common';
 

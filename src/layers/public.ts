@@ -1,4 +1,4 @@
-import cy from 'cytoscape';
+import type cy from 'cytoscape';
 
 export interface IPoint {
   x: number;
@@ -17,8 +17,8 @@ export interface ILayerOptions {
   stopClicks?: boolean;
 }
 
-export interface ISVGLayerOptions extends ILayerOptions {}
-export interface IHTMLLayerOptions extends ILayerOptions {}
+export type ISVGLayerOptions = ILayerOptions;
+export type IHTMLLayerOptions = ILayerOptions;
 export interface ICanvasLayerOptions extends ILayerOptions, Partial<CanvasRenderingContext2DSettings> {
   pixelRatio?: number;
 }
