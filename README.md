@@ -57,7 +57,7 @@ layers.renderPerEdge(layers.append('canvas'), (ctx, edge, path) => {
 
 render a bar and a histogram below each node
 
-Code: [annotation](./samples/annotation.ts)
+Code: [annotation](./samples/annotations.ts)
 
 ![image](https://user-images.githubusercontent.com/4129778/87443573-f79ad400-c5f5-11ea-91c7-db327e6278ff.png)
 
