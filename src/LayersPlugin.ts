@@ -26,7 +26,6 @@ import {
   ISVGLayerOptions,
   ICanvasLayerOptions,
   IPoint,
-  CytoscapeBaseLayer,
 } from './layers';
 import type { ILayerAdapter } from './layers/ABaseLayer';
 import { renderPerEdge, renderPerNode } from './elements';
@@ -337,11 +336,11 @@ export default class LayersPlugin {
     const before = layers
       .slice(0, nodeIndex)
       .reverse()
-      .filter((d) => d.supportsRender && d !== this.dragLayer && d !== this.selectBoxLayer);
+      .filter((d) => d.supportsRender() && d !== this.dragLayer && d !== this.selectBoxLayer);
 
     const after = layers
       .slice(nodeIndex + 1)
-      .filter((d) => d.supportsRender && d !== this.dragLayer && d !== this.selectBoxLayer);
+      .filter((d) => d.supportsRender() && d !== this.dragLayer && d !== this.selectBoxLayer);
 
     const scale = options.scale ?? 1;
 

@@ -35,7 +35,7 @@ export class CytoscapeBaseLayer extends ABaseLayer implements ILayerImpl {
     // dummy
   }
 
-  get supportsRender(): boolean {
+  supportsRender(): boolean {
     return true;
   }
 }

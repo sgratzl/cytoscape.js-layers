@@ -35,7 +35,7 @@ export abstract class ABaseLayer implements IMoveAbleLayer {
     return this.adapter.inVisibleBounds(p);
   }
 
-  get supportsRender() {
+  supportsRender() {
     return false;
   }
 

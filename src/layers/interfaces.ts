@@ -19,6 +19,6 @@ export interface ILayerImpl {
   remove(): void;
   setViewport(tx: number, ty: number, zoom: number): void;
 
-  readonly supportsRender: boolean;
+  supportsRender(): boolean;
   renderInto(ctx: CanvasRenderingContext2D, hint: IRenderHint): void;
 }

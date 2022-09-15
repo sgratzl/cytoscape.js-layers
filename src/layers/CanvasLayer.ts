@@ -92,6 +92,10 @@ export class CanvasBaseLayer extends ABaseLayer implements ILayerImpl {
     ctx.restore();
   }
 
+  supportsRender(): boolean {
+    return true;
+  }
+
   renderInto(ctx: CanvasRenderingContext2D, hint: IRenderHint): void {
     this.drawImpl(ctx, hint.scale);
   }
