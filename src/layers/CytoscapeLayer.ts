@@ -34,6 +34,10 @@ export class CytoscapeBaseLayer extends ABaseLayer implements ILayerImpl {
   remove() {
     // dummy
   }
+
+  supportsRender(): boolean {
+    return true;
+  }
 }
 
 export class CytoscapeNodeLayer extends CytoscapeBaseLayer implements ICytoscapeNodeLayer {

@@ -30,6 +30,10 @@ export class SVGLayer extends ADOMBaseLayer<SVGElement> implements ISVGLayer, IL
       this.update();
     }
   }
+
+  supportsRender(): boolean {
+    return this.node.childElementCount === 0;
+  }
 }
 
 export class SVGStaticLayer extends ADOMBaseLayer<SVGElement> implements ISVGStaticLayer, ILayerImpl {
