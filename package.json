@@ -96,5 +96,10 @@
     "docs": "typedoc src/index.ts",
     "prepare": "yarn run build"
   },
-  "packageManager": "yarn@3.2.3"
+  "packageManager": "yarn@3.2.3",
+  "dependenciesMeta": {
+    "cytoscape@3.23.0": {
+      "unplugged": true
+    }
+  }
 }

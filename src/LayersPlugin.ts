@@ -26,13 +26,22 @@ import {
   ISVGLayerOptions,
   ICanvasLayerOptions,
   IPoint,
+  CytoscapeBaseLayer,
 } from './layers';
 import type { ILayerAdapter } from './layers/ABaseLayer';
 import { renderPerEdge, renderPerNode } from './elements';
+import { output } from './copied';
 
 function isPoint(p: IPoint | cy.BoundingBox12): p is IPoint {
   return (p as IPoint).x != null;
 }
+
+export interface LayerExportOptions {
+  ignoreUnsupportedLayers?: boolean;
+  ignoreUnsupportedLayerOrder?: boolean;
+}
+
+export class LayerExportException extends Error {}
 
 export default class LayersPlugin {
   readonly cy: cy.Core;
@@ -284,6 +293,120 @@ export default class LayersPlugin {
   getFirst(): ILayer | null {
     const layers = this.layers;
     return layers[0] ?? null;
+  }
+
+  private toCanvas(
+    options: (cy.ExportJpgStringOptions | cy.ExportJpgBlobOptions | cy.ExportJpgBlobPromiseOptions) & LayerExportOptions
+  ): HTMLCanvasElement {
+    const layers = this.layers;
+
+    if (layers.some((d) => !d.supportsRender) && !options.ignoreUnsupportedLayers) {
+      throw new LayerExportException(
+        `some layer doesn't support exporting, use {ignoreUnsupportedLayers: true} option to ignore`
+      );
+    }
+
+    const nodeIndex = layers.indexOf(this.nodeLayer as ILayer & ILayerImpl);
+    const dragIndex = layers.indexOf(this.dragLayer as ILayer & ILayerImpl);
+    const selectBoxIndex = layers.indexOf(this.selectBoxLayer as ILayer & ILayerImpl);
+
+    if ((nodeIndex !== dragIndex - 1 || dragIndex !== selectBoxIndex - 1) && !options.ignoreUnsupportedLayerOrder) {
+      throw new LayerExportException(
+        `cytoscape layers are not in order, use {ignoreUnsupportedLayerOrder: true} option to ignore`
+      );
+    }
+
+    const renderer = (
+      this.cy as unknown as {
+        renderer(): {
+          bufferCanvasImage(
+            options: cy.ExportJpgStringOptions | cy.ExportJpgBlobOptions | cy.ExportJpgBlobPromiseOptions
+          ): HTMLCanvasElement;
+        };
+      }
+    ).renderer();
+
+    const bg = options.bg;
+
+    const canvas = renderer.bufferCanvasImage({ ...options, bg: undefined });
+
+    const width = canvas.width;
+    const height = canvas.height;
+    const ctx = canvas.getContext('2d')!;
+
+    const before = layers
+      .slice(0, nodeIndex)
+      .reverse()
+      .filter((d) => d.supportsRender && d !== this.dragLayer && d !== this.selectBoxLayer);
+
+    const after = layers
+      .slice(nodeIndex + 1)
+      .filter((d) => d.supportsRender && d !== this.dragLayer && d !== this.selectBoxLayer);
+
+    const scale = options.scale ?? 1;
+
+    const hint = { scale, width, height, full: options.full ?? false };
+
+    ctx.globalCompositeOperation = 'destination-over';
+    for (const l of before) {
+      l.renderInto(ctx, hint);
+    }
+
+    ctx.globalCompositeOperation = 'source-over';
+    for (const l of after) {
+      l.renderInto(ctx, hint);
+    }
+
+    if (bg) {
+      ctx.globalCompositeOperation = 'destination-over';
+      ctx.fillStyle = bg;
+      ctx.rect(0, 0, width, height);
+      ctx.fill();
+    }
+
+    return canvas;
+  }
+
+  /**
+   * Export the current graph view as a PNG image in Base64 representation.
+   */
+  png(options?: cy.ExportStringOptions & LayerExportOptions): string;
+  png(options?: cy.ExportBlobOptions & LayerExportOptions): Blob;
+  png(options?: cy.ExportBlobPromiseOptions & LayerExportOptions): Promise<Blob>;
+
+  png(
+    options?: (cy.ExportStringOptions | cy.ExportBlobOptions | cy.ExportBlobPromiseOptions) & LayerExportOptions
+  ): any {
+    return output(options ?? {}, this.toCanvas(options ?? {}), 'image/png');
+  }
+
+  /**
+   * Export the current graph view as a JPG image in Base64 representation.
+   */
+  jpg(options?: cy.ExportJpgStringOptions & LayerExportOptions): string;
+  jpg(options?: cy.ExportJpgBlobOptions & LayerExportOptions): Blob;
+  jpg(options?: cy.ExportJpgBlobPromiseOptions & LayerExportOptions): Promise<Blob>;
+
+  jpg(
+    options?: (cy.ExportJpgStringOptions | cy.ExportJpgBlobOptions | cy.ExportJpgBlobPromiseOptions) &
+      LayerExportOptions
+  ): any {
+    const o = {
+      bg: '#fff',
+      ...(options ?? {}),
+    };
+    return output(o, this.toCanvas(o), 'image/png');
+  }
+
+  /**
+   * Export the current graph view as a JPG image in Base64 representation.
+   */
+  jpeg(options?: cy.ExportJpgStringOptions): string;
+  jpeg(options?: cy.ExportJpgBlobOptions): Blob;
+  jpeg(options?: cy.ExportJpgBlobPromiseOptions): Promise<Blob>;
+
+  jpeg(options?: cy.ExportJpgStringOptions | cy.ExportJpgBlobOptions | cy.ExportJpgBlobPromiseOptions): any {
+    return this.jpg(options as unknown as any);
   }
 
   readonly renderPerEdge = renderPerEdge;

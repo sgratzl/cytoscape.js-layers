@@ -7,6 +7,7 @@ import type {
   IHTMLStaticLayer,
   ISVGStaticLayer,
   ICanvasStaticLayer,
+  IRenderHint,
 } from './interfaces';
 import type cy from 'cytoscape';
 import type { ICanvasLayerOptions, ISVGLayerOptions, IHTMLLayerOptions } from './public';
@@ -32,6 +33,14 @@ export abstract class ABaseLayer implements IMoveAbleLayer {
 
   inVisibleBounds(p: { x: number; y: number } | cy.BoundingBox12) {
     return this.adapter.inVisibleBounds(p);
+  }
+
+  get supportsRender() {
+    return false;
+  }
+
+  renderInto(_ctx: CanvasRenderingContext2D, _hint: IRenderHint): void {
+    // dummy
   }
 
   get updateOnRender() {
