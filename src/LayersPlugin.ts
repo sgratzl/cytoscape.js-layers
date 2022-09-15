@@ -45,6 +45,8 @@ export class LayerExportException extends Error {}
 export default class LayersPlugin {
   readonly cy: cy.Core;
 
+  private bak: Record<string, any> = {};
+
   readonly nodeLayer: ICytoscapeNodeLayer;
 
   readonly dragLayer: ICytoscapeDragLayer;
@@ -116,6 +118,15 @@ export default class LayersPlugin {
     cy.on('resize', this.resize);
     cy.on('destroy', this.destroy);
 
+    this.bak = {
+      png: cy.png,
+      jpg: cy.jpg,
+      jpeg: cy.jpeg,
+    };
+    cy.png = this.png.bind(this);
+    cy.jpg = this.jpg.bind(this);
+    cy.jpeg = this.jpeg.bind(this);
+
     this.viewport = {
       width: this.cy.width(),
       height: this.cy.height(),
@@ -177,6 +188,12 @@ export default class LayersPlugin {
     this.cy.off('viewport', this.zoomed);
     this.cy.off('resize', this.resize);
     this.cy.scratch('_layers', undefined);
+
+    this.cy.png = this.bak.png;
+    this.cy.jpg = this.bak.jpg;
+    this.cy.jpeg = this.bak.jpeg;
+
+    this.bak = {};
   };
 
   private readonly zoomed = () => {

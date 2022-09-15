@@ -109,16 +109,14 @@ namespace AnimatedEdges {
     requestAnimationFrame(update);
 
     document.getElementById('png')?.addEventListener('click', () => {
-      layers
-        .png({
-          output: 'blob-promise',
-        })
-        .then((r) => {
-          const url = URL.createObjectURL(r);
-          const a = document.getElementById('url') as HTMLAnchorElement;
-          a.href = url;
-          a.click();
-        });
+      cy.png({
+        output: 'blob-promise',
+      }).then((r) => {
+        const url = URL.createObjectURL(r);
+        const a = document.getElementById('url') as HTMLAnchorElement;
+        a.href = url;
+        a.click();
+      });
     });
   }
 
