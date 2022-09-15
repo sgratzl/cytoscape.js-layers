@@ -25,6 +25,7 @@ export interface ILayerAdapter {
 
 export abstract class ABaseLayer implements IMoveAbleLayer {
   private updateOnRenderEnabled = false;
+
   private updateOnRenderOnceEnabled = false;
 
   constructor(private readonly adapter: ILayerAdapter) {}
