@@ -1,4 +1,11 @@
-import type { ICanvasLayer, ILayerElement, ILayerImpl, IRenderFunction, ICanvasStaticLayer } from './interfaces';
+import type {
+  ICanvasLayer,
+  ILayerElement,
+  ILayerImpl,
+  IRenderFunction,
+  ICanvasStaticLayer,
+  IRenderHint,
+} from './interfaces';
 import { layerStyle, stopClicks } from './utils';
 import { ABaseLayer, ILayerAdapter } from './ABaseLayer';
 import type { ICanvasLayerOptions } from './public';
@@ -68,17 +75,29 @@ export class CanvasBaseLayer extends ABaseLayer implements ILayerImpl {
 
   draw() {
     this.clear();
-    this.ctx.save();
-    this.ctx.resetTransform();
-    this.ctx.scale(this.pixelRatio, this.pixelRatio);
-    this.ctx.translate(this.transform.tx, this.transform.ty);
-    this.ctx.scale(this.transform.zoom, this.transform.zoom);
+    this.drawImpl(this.ctx);
+  }
+
+  private drawImpl(ctx: CanvasRenderingContext2D, scale = 1) {
+    ctx.save();
+    ctx.resetTransform();
+    ctx.scale(this.pixelRatio, this.pixelRatio);
+    ctx.translate(this.transform.tx * scale, this.transform.ty * scale);
+    ctx.scale(this.transform.zoom * scale, this.transform.zoom * scale);
 
     for (const r of this.callbacks) {
-      r(this.ctx);
+      r(ctx);
     }
 
-    this.ctx.restore();
+    ctx.restore();
+  }
+
+  supportsRender(): boolean {
+    return true;
+  }
+
+  renderInto(ctx: CanvasRenderingContext2D, hint: IRenderHint): void {
+    this.drawImpl(ctx, hint.scale);
   }
 
   resize(width: number, height: number) {

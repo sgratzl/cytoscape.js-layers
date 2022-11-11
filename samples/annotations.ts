@@ -60,4 +60,18 @@ namespace Annotations {
   });
 
   console.log(layers);
+
+  document.getElementById('png')?.addEventListener('click', () => {
+    layers
+      .png({
+        output: 'blob-promise',
+        ignoreUnsupportedLayerOrder: true,
+      })
+      .then((r) => {
+        const url = URL.createObjectURL(r);
+        const a = document.getElementById('url') as HTMLAnchorElement;
+        a.href = url;
+        a.click();
+      });
+  });
 }

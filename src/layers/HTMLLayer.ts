@@ -31,6 +31,10 @@ export class HTMLLayer extends ADOMBaseLayer<HTMLElement> implements IHTMLLayer,
       this.update();
     }
   }
+
+  supportsRender(): boolean {
+    return this.node.childElementCount === 0;
+  }
 }
 
 export class HTMLStaticLayer extends ADOMBaseLayer<HTMLElement> implements IHTMLStaticLayer, ILayerImpl {

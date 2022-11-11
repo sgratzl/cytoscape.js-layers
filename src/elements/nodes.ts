@@ -94,16 +94,16 @@ export function renderPerNode(
   if (o.updateOn === 'render') {
     layer.updateOnRender = true;
   } else if (o.updateOn === 'position') {
-    nodes.on('position add remove', layer.update);
+    nodes.on('position add remove', layer.updateOnRenderOnce);
   } else {
-    nodes.on('add remove', layer.update);
+    nodes.on('add remove', layer.updateOnRenderOnce);
   }
 
   const wrapResult = (v: ICallbackRemover): IRenderPerNodeResult => ({
     layer,
     nodes,
     remove: () => {
-      nodes.off('position add remove', undefined, layer.update);
+      nodes.off('position add remove', undefined, layer.updateOnRenderOnce);
       v.remove();
     },
   });
@@ -160,10 +160,10 @@ export function renderPerNode(
       },
       update: (elem, node, bb) => {
         if (oDOM.position === 'top-left') {
-          elem.style.transform = `${oDOM.transform}translate(${bb.x1}px,${bb.y1}px)`;
+          elem.style.transform = `${oDOM.transform}translate3d(${bb.x1}px,${bb.y1}px,0)`;
         } else if (oDOM.position === 'center') {
           const pos = node.position();
-          elem.style.transform = `${oDOM.transform}translate(${pos.x}px,${pos.y}px)`;
+          elem.style.transform = `${oDOM.transform}translate3d(${pos.x}px,${pos.y}px,0)`;
         }
         render(elem, node, bb);
       },
@@ -190,10 +190,10 @@ export function renderPerNode(
     },
     update: (elem, node, bb) => {
       if (oDOM.position === 'top-left') {
-        elem.setAttribute('transform', `${oDOM.transform}translate(${bb.x1},${bb.y1})`);
+        elem.setAttribute('transform', `${oDOM.transform}translate3d(${bb.x1},${bb.y1},0)`);
       } else if (oDOM.position === 'center') {
         const pos = node.position();
-        elem.setAttribute('transform', `${oDOM.transform}translate(${pos.x},${pos.y})`);
+        elem.setAttribute('transform', `${oDOM.transform}translate3d(${pos.x},${pos.y},0)`);
       }
       render(elem, node, bb);
     },

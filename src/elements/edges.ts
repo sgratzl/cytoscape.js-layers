@@ -38,11 +38,11 @@ export function renderPerEdge(
   if (o.updateOn === 'render') {
     layer.updateOnRender = true;
   } else if (o.updateOn === 'position') {
-    edges.on('position add remove', layer.update);
-    edges.sources().on('position', layer.update);
-    edges.targets().on('position', layer.update);
+    edges.on('position add remove', layer.updateOnRenderOnce);
+    edges.sources().on('position', layer.updateOnRenderOnce);
+    edges.targets().on('position', layer.updateOnRenderOnce);
   } else {
-    edges.on('add remove', layer.update);
+    edges.on('add remove', layer.updateOnRenderOnce);
   }
 
   const renderer = (ctx: CanvasRenderingContext2D) => {
@@ -81,9 +81,9 @@ export function renderPerEdge(
     layer,
     edges,
     remove: () => {
-      edges.off('position add remove', undefined, layer.update);
-      edges.sources().off('position', undefined, layer.update);
-      edges.targets().off('position', undefined, layer.update);
+      edges.off('position add remove', undefined, layer.updateOnRenderOnce);
+      edges.sources().off('position', undefined, layer.updateOnRenderOnce);
+      edges.targets().off('position', undefined, layer.updateOnRenderOnce);
       r.remove();
     },
   };

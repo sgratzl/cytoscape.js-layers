@@ -7,6 +7,7 @@ import type {
   IHTMLStaticLayer,
   ISVGStaticLayer,
   ICanvasStaticLayer,
+  IRenderHint,
 } from './interfaces';
 import type cy from 'cytoscape';
 import type { ICanvasLayerOptions, ISVGLayerOptions, IHTMLLayerOptions } from './public';
@@ -26,10 +27,20 @@ export interface ILayerAdapter {
 export abstract class ABaseLayer implements IMoveAbleLayer {
   private updateOnRenderEnabled = false;
 
+  private updateOnRenderOnceEnabled = false;
+
   constructor(private readonly adapter: ILayerAdapter) {}
 
   inVisibleBounds(p: { x: number; y: number } | cy.BoundingBox12) {
     return this.adapter.inVisibleBounds(p);
+  }
+
+  supportsRender() {
+    return false;
+  }
+
+  renderInto(_ctx: CanvasRenderingContext2D, _hint: IRenderHint): void {
+    // dummy
   }
 
   get updateOnRender() {
@@ -46,6 +57,17 @@ export abstract class ABaseLayer implements IMoveAbleLayer {
     } else {
       this.cy.off('render', this.update);
     }
+  }
+
+  updateOnRenderOnce() {
+    if (this.updateOnRenderOnceEnabled) {
+      return;
+    }
+    this.updateOnRenderOnceEnabled = true;
+    this.cy.one('render', () => {
+      this.updateOnRenderOnceEnabled = false;
+      this.update();
+    });
   }
 
   abstract readonly update: () => void;
