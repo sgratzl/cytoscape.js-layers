@@ -26,6 +26,7 @@ import {
   ISVGLayerOptions,
   ICanvasLayerOptions,
   IPoint,
+  CytoscapeBaseLayer,
 } from './layers';
 import type { ILayerAdapter } from './layers/ABaseLayer';
 import { renderPerEdge, renderPerNode } from './elements';
@@ -311,6 +312,10 @@ export default class LayersPlugin {
     return layers[0] ?? null;
   }
 
+  private hasCustomLayer(): boolean {
+    return this.layers.some((d) => !(d instanceof CytoscapeBaseLayer));
+  }
+
   private toCanvas(
     options: (cy.ExportJpgStringOptions | cy.ExportJpgBlobOptions | cy.ExportJpgBlobPromiseOptions) & LayerExportOptions
   ): HTMLCanvasElement {
@@ -393,6 +398,9 @@ export default class LayersPlugin {
   png(
     options?: (cy.ExportStringOptions | cy.ExportBlobOptions | cy.ExportBlobPromiseOptions) & LayerExportOptions
   ): any {
+    if (!this.hasCustomLayer()) {
+      return this.bak.png.call(this.cy, options);
+    }
     return output(options ?? {}, this.toCanvas(options ?? {}), 'image/png');
   }
 
@@ -407,6 +415,9 @@ export default class LayersPlugin {
     options?: (cy.ExportJpgStringOptions | cy.ExportJpgBlobOptions | cy.ExportJpgBlobPromiseOptions) &
       LayerExportOptions
   ): any {
+    if (!this.hasCustomLayer()) {
+      return this.bak.jpg.call(this.cy, options);
+    }
     const o = {
       bg: '#fff',
       ...(options ?? {}),
@@ -422,6 +433,9 @@ export default class LayersPlugin {
   jpeg(options?: cy.ExportJpgBlobPromiseOptions): Promise<Blob>;
 
   jpeg(options?: cy.ExportJpgStringOptions | cy.ExportJpgBlobOptions | cy.ExportJpgBlobPromiseOptions): any {
+    if (!this.hasCustomLayer()) {
+      return this.bak.jpeg.call(this.cy, options);
+    }
     return this.jpg(options as unknown as any);
   }
 
