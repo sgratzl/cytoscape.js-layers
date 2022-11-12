@@ -75,19 +75,19 @@ export default function Config(options) {
         },
         buildFormat('cjs') && {
           ...base.output,
-          file: pkg.main,
+          file: pkg.require,
           format: 'cjs',
         },
       ].filter(Boolean),
     },
-    ((buildFormat('umd') && pkg.browser) || (buildFormat('umd-min') && pkg.unpkg)) && {
+    ((buildFormat('umd') && pkg.umd) || (buildFormat('umd-min') && pkg.unpkg)) && {
       ...base,
       input: fs.existsSync(base.input.replace('.ts', '.umd.ts')) ? base.input.replace('.ts', '.umd.ts') : base.input,
       output: [
         buildFormat('umd') &&
-          pkg.browser && {
+          pkg.umd && {
             ...base.output,
-            file: pkg.browser,
+            file: pkg.umd,
             format: 'umd',
             name: pkg.global,
           },

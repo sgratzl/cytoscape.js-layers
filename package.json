@@ -32,8 +32,9 @@
     "last 2 Firefox versions"
   ],
   "module": "build/index.js",
-  "main": "build/index.cjs.js",
-  "browser": "build/index.umd.js",
+  "main": "build/index.cjs",
+  "require": "build/index.cjs",
+  "umd": "build/index.umd.js",
   "unpkg": "build/index.umd.min.js",
   "jsdelivr": "build/index.umd.min.js",
   "types": "build/index.d.ts",
