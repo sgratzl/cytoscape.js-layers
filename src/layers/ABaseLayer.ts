@@ -59,7 +59,7 @@ export abstract class ABaseLayer implements IMoveAbleLayer {
     }
   }
 
-  updateOnRenderOnce() {
+  updateOnRenderOnce = () => {
     if (this.updateOnRenderOnceEnabled) {
       return;
     }
@@ -68,7 +68,7 @@ export abstract class ABaseLayer implements IMoveAbleLayer {
       this.updateOnRenderOnceEnabled = false;
       this.update();
     });
-  }
+  };
 
   abstract readonly update: () => void;
 
