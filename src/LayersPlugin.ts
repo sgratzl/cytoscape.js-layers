@@ -341,7 +341,7 @@ export default class LayersPlugin {
       this.cy as unknown as {
         renderer(): {
           bufferCanvasImage(
-            options: cy.ExportJpgStringOptions | cy.ExportJpgBlobOptions | cy.ExportJpgBlobPromiseOptions
+            o: cy.ExportJpgStringOptions | cy.ExportJpgBlobOptions | cy.ExportJpgBlobPromiseOptions
           ): HTMLCanvasElement;
         };
       }
