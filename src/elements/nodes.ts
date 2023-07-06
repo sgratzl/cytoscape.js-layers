@@ -100,7 +100,7 @@ export function renderPerNode(
       nodes = reevaluateCollection(nodes);
       layer.update();
     });
-  }
+  };
 
   const reevaluateCollection = (current: cy.NodeCollection) => {
     // clean up old

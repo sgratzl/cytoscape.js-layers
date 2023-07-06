@@ -42,7 +42,7 @@ export function renderPerEdge(
       edges = reevaluateCollection(edges);
       layer.update();
     });
-  }
+  };
 
   const reevaluateCollection = (current: cy.EdgeCollection) => {
     // clean up old
