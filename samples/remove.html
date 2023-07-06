@@ -12,7 +12,8 @@
   </head>
   <body>
     <div id="app"></div>
-    <button id="btn">Click</button>
+    <button id="btn">Remove</button>
+    <button id="btn2">Add</button>
     <script src="https://cdn.jsdelivr.net/npm/cytoscape"></script>
     <script src="../build/index.umd.js"></script>
     <script>
@@ -44,15 +45,24 @@
         elem.textContent = node.id();
         // xx
       });
-      layers.renderPerEdge(layers.append('canvas'), (ctx, edge, path) => {
-        ctx.strokeStyle = 'red';
-        ctx.stroke(path);
-      });
+      // layers.renderPerEdge(layers.append('canvas'), (ctx, edge, path) => {
+      //   ctx.strokeStyle = 'red';
+      //   ctx.stroke(path);
+      // });
 
       document.querySelector('#btn').onclick = function () {
         console.time('del');
         cy.remove('node[id > 50]');
         console.timeEnd('del');
+      };
+      document.querySelector('#btn2').onclick = function () {
+        console.time('add');
+        const newElements = []
+        for (let i = 800; i < 900; i++) {
+          newElements.push({ data: { id: i } });
+        }
+        cy.add(newElements);
+        console.timeEnd('add');
       };
     </script>
   </body>

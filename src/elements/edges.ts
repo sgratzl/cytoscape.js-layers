@@ -31,28 +31,35 @@ export function renderPerEdge(
     options
   );
   let edges = layer.cy.collection() as cy.EdgeCollection;
-  const revaluateAndUpdate = () => {
-    edges = reevaluateCollection(edges);
-    layer.updateOnRenderOnce();
-  };
+  let updateOnRenderOnceEnabled = false;
+  const revaluateAndUpdateOnce = () => {
+    if (updateOnRenderOnceEnabled) {
+      return;
+    }
+    updateOnRenderOnceEnabled = true;
+    layer.cy.one('render', () => {
+      updateOnRenderOnceEnabled = false;
+      edges = reevaluateCollection(edges);
+      layer.update();
+    });
+  }
 
   const reevaluateCollection = (current: cy.EdgeCollection) => {
     // clean up old
-    current.off('position', undefined, layer.updateOnRenderOnce);
-    current.sources().off('position', undefined, layer.updateOnRenderOnce);
-    current.targets().off('position', undefined, layer.updateOnRenderOnce);
-
-    current.off('remove', undefined, revaluateAndUpdate);
+    if (o.updateOn !== 'none' && o.updateOn !== 'render') {
+      current.off(o.updateOn, undefined, layer.updateOnRenderOnce);
+      current.sources().off(o.updateOn, undefined, layer.updateOnRenderOnce);
+      current.targets().off(o.updateOn, undefined, layer.updateOnRenderOnce);
+    }
 
     // init new
     const newEdges = layer.cy.edges(o.selector);
     o.initCollection(newEdges);
-    if (o.updateOn === 'position') {
-      newEdges.on('position', layer.updateOnRenderOnce);
-      newEdges.sources().on('position', layer.updateOnRenderOnce);
-      newEdges.targets().on('position', layer.updateOnRenderOnce);
+    if (o.updateOn !== 'none' && o.updateOn !== 'render') {
+      newEdges.on(o.updateOn, layer.updateOnRenderOnce);
+      newEdges.sources().on(o.updateOn, layer.updateOnRenderOnce);
+      newEdges.targets().on(o.updateOn, layer.updateOnRenderOnce);
     }
-    newEdges.on('remove', revaluateAndUpdate);
     layer.updateOnRenderOnce();
     return newEdges;
   };
@@ -61,7 +68,7 @@ export function renderPerEdge(
     layer.updateOnRender = true;
   } else {
     edges = reevaluateCollection(edges);
-    layer.cy.on('add', revaluateAndUpdate);
+    layer.cy.on('add remove', o.selector, revaluateAndUpdateOnce);
   }
 
   const renderer = (ctx: CanvasRenderingContext2D) => {
@@ -102,11 +109,12 @@ export function renderPerEdge(
     layer,
     edges,
     remove: () => {
-      edges.off('position', undefined, layer.updateOnRenderOnce);
-      edges.sources().off('position', undefined, layer.updateOnRenderOnce);
-      edges.targets().off('position', undefined, layer.updateOnRenderOnce);
-      edges.off('remove', undefined, revaluateAndUpdate);
-      layer.cy.off('add', revaluateAndUpdate);
+      if (o.updateOn !== 'none' && o.updateOn !== 'render') {
+        edges.off(o.updateOn, undefined, layer.updateOnRenderOnce);
+        edges.sources().off(o.updateOn, undefined, layer.updateOnRenderOnce);
+        edges.targets().off(o.updateOn, undefined, layer.updateOnRenderOnce);
+      }
+      layer.cy.off('add remove', o.selector, revaluateAndUpdateOnce);
       r.remove();
     },
   };

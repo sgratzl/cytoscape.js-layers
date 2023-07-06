@@ -89,23 +89,31 @@ export function renderPerNode(
   );
 
   let nodes = layer.cy.collection() as cy.NodeCollection;
-  const revaluateAndUpdate = () => {
-    nodes = reevaluateCollection(nodes);
-    layer.updateOnRenderOnce();
-  };
+  let updateOnRenderOnceEnabled = false;
+  const revaluateAndUpdateOnce = () => {
+    if (updateOnRenderOnceEnabled) {
+      return;
+    }
+    updateOnRenderOnceEnabled = true;
+    layer.cy.one('render', () => {
+      updateOnRenderOnceEnabled = false;
+      nodes = reevaluateCollection(nodes);
+      layer.update();
+    });
+  }
 
   const reevaluateCollection = (current: cy.NodeCollection) => {
     // clean up old
-    current.off('position', undefined, layer.updateOnRenderOnce);
-    current.off('remove', undefined, revaluateAndUpdate);
+    if (o.updateOn !== 'none' && o.updateOn !== 'render') {
+      current.off(o.updateOn, undefined, layer.updateOnRenderOnce);
+    }
 
     // init new
     const newNodes = layer.cy.nodes(o.selector);
     o.initCollection(newNodes);
-    if (o.updateOn === 'position') {
-      newNodes.on('position', layer.updateOnRenderOnce);
+    if (o.updateOn !== 'none' && o.updateOn !== 'render') {
+      newNodes.on(o.updateOn, layer.updateOnRenderOnce);
     }
-    newNodes.on('remove', revaluateAndUpdate);
     layer.updateOnRenderOnce();
     return newNodes;
   };
@@ -114,16 +122,17 @@ export function renderPerNode(
     layer.updateOnRender = true;
   } else {
     nodes = reevaluateCollection(nodes);
-    layer.cy.on('add', revaluateAndUpdate);
+    layer.cy.on('add remove', o.selector, revaluateAndUpdateOnce);
   }
 
   const wrapResult = (v: ICallbackRemover): IRenderPerNodeResult => ({
     layer,
     nodes,
     remove: () => {
-      nodes.off('position', undefined, layer.updateOnRenderOnce);
-      nodes.off('remove', undefined, revaluateAndUpdate);
-      layer.cy.off('add', revaluateAndUpdate);
+      if (o.updateOn !== 'none' && o.updateOn !== 'render') {
+        nodes.off(o.updateOn, undefined, layer.updateOnRenderOnce);
+      }
+      layer.cy.off('add remove', o.selector, revaluateAndUpdateOnce);
       v.remove();
     },
   });
