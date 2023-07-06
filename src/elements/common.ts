@@ -10,9 +10,12 @@ export interface IElementLayerOptions {
   queryEachTime: boolean;
   /**
    * automatically update the layer upon a certain event
+   * render ... upon render
+   * none ... only when add/remove
+   * position or custom ... extra events to listen to
    * @default auto = render in case of a queryEachTime else position
    */
-  updateOn: 'render' | 'position' | 'none';
+  updateOn: 'render' | 'position' | 'none' | string;
 
   /**
    * whether to check that the element is actually visible
