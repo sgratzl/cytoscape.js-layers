@@ -16,6 +16,9 @@ export function matchNodes<T extends HTMLElement | SVGElement>(
   const arr = Array.from(root.children) as T[];
   if (!options.uniqueElements) {
     nodes.forEach((node) => {
+      if (node.removed()) {
+        return;
+      }
       const bb = options.bb(node);
       if (!options.isVisible(bb)) {
         return;
@@ -38,6 +41,9 @@ export function matchNodes<T extends HTMLElement | SVGElement>(
 
   let i = -1;
   nodes.forEach((node) => {
+    if (node.removed()) {
+      return;
+    }
     const bb = options.bb(node);
     if (!options.isVisible(bb)) {
       return;

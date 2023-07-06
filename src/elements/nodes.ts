@@ -87,23 +87,43 @@ export function renderPerNode(
     defaultElementLayerOptions(options),
     options
   );
-  const nodes = o.queryEachTime ? layer.cy.collection() : layer.cy.nodes(o.selector);
-  if (!o.queryEachTime) {
-    o.initCollection(nodes);
-  }
+
+  let nodes = layer.cy.collection() as cy.NodeCollection;
+  const revaluateAndUpdate = () => {
+    nodes = reevaluateCollection(nodes);
+    layer.updateOnRenderOnce();
+  };
+
+  const reevaluateCollection = (current: cy.NodeCollection) => {
+    // clean up old
+    current.off('position', undefined, layer.updateOnRenderOnce);
+    current.off('remove', undefined, revaluateAndUpdate);
+
+    // init new
+    const newNodes = layer.cy.nodes(o.selector);
+    o.initCollection(newNodes);
+    if (o.updateOn === 'position') {
+      newNodes.on('position', layer.updateOnRenderOnce);
+    }
+    newNodes.on('remove', revaluateAndUpdate);
+    layer.updateOnRenderOnce();
+    return newNodes;
+  };
+
   if (o.updateOn === 'render') {
     layer.updateOnRender = true;
-  } else if (o.updateOn === 'position') {
-    nodes.on('position add remove', layer.updateOnRenderOnce);
   } else {
-    nodes.on('add remove', layer.updateOnRenderOnce);
+    nodes = reevaluateCollection(nodes);
+    layer.cy.on('add', revaluateAndUpdate);
   }
 
   const wrapResult = (v: ICallbackRemover): IRenderPerNodeResult => ({
     layer,
     nodes,
     remove: () => {
-      nodes.off('position add remove', undefined, layer.updateOnRenderOnce);
+      nodes.off('position', undefined, layer.updateOnRenderOnce);
+      nodes.off('remove', undefined, revaluateAndUpdate);
+      layer.cy.off('add', revaluateAndUpdate);
       v.remove();
     },
   });
@@ -112,11 +132,13 @@ export function renderPerNode(
     const oCanvas = o as INodeCanvasLayerOption;
     const renderer = (ctx: CanvasRenderingContext2D) => {
       const t = ctx.getTransform();
-      const currentNodes = oCanvas.queryEachTime ? layer.cy.nodes(oCanvas.selector) : nodes;
       if (o.queryEachTime) {
-        o.initCollection(currentNodes);
+        nodes = reevaluateCollection(nodes);
       }
-      currentNodes.forEach((node) => {
+      nodes.forEach((node) => {
+        if (node.removed()) {
+          return;
+        }
         const bb = node.boundingBox(o.boundingBox);
         if (oCanvas.checkBounds && !layer.inVisibleBounds(bb)) {
           return;
@@ -169,11 +191,10 @@ export function renderPerNode(
       },
     };
     const renderer = (root: HTMLElement) => {
-      const currentNodes = oDOM.queryEachTime ? layer.cy.nodes(oDOM.selector) : nodes;
       if (o.queryEachTime) {
-        o.initCollection(currentNodes);
+        nodes = reevaluateCollection(nodes);
       }
-      matchNodes(root, currentNodes, matchOptions);
+      matchNodes(root, nodes, matchOptions);
     };
     return wrapResult(registerCallback(layer, renderer));
   }
@@ -199,11 +220,10 @@ export function renderPerNode(
     },
   };
   const renderer = (root: SVGElement) => {
-    const currentNodes = oDOM.queryEachTime ? layer.cy.nodes(oDOM.selector) : nodes;
     if (o.queryEachTime) {
-      o.initCollection(currentNodes);
+      nodes = reevaluateCollection(nodes);
     }
-    matchNodes(root, currentNodes, matchOptions);
+    matchNodes(root, nodes, matchOptions);
   };
   return wrapResult(registerCallback(layer, renderer));
 }
