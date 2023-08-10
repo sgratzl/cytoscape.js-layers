@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Sample</title>
+    <style>
+      body {
+        margin: 0;
+      }
+      #app {
+        width: 100vw;
+        height: 100vh;
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script src="https://cdn.jsdelivr.net/npm/cytoscape"></script>
+    <script src="../build/index.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/cytoscape-overlays@^1.3.0"></script>
+    <script>
+      const cy = cytoscape({
+        container: document.getElementById('app'),
+        elements: [
+          ...['a', 'b'].map((id) => ({
+            data: {
+              id,
+              value: Math.random(),
+              values: Array(100)
+                .fill(0)
+                .map(() => Math.random()),
+              line: Array(10)
+                .fill(0)
+                .map(() => Math.random()),
+            },
+          })),
+          {
+            data: {
+              id: 'ab',
+              source: 'a',
+              target: 'b',
+            },
+          },
+        ],
+      });
+      cy.overlays(
+        [
+          {
+            position: 'top',
+            vis: CytoscapeOverlays.renderBar('value', {
+              backgroundColor: 'steelblue',
+            }),
+          },
+          {
+            vis: CytoscapeOverlays.renderBoxplot('values', {
+              backgroundColor: 'darkred',
+            }),
+          },
+          {
+            vis: CytoscapeOverlays.renderHistogram('values', {
+              backgroundColor: 'darkgreen',
+            }),
+          },
+          {
+            vis: CytoscapeOverlays.renderSparkLine('line', {
+              backgroundColor: 'darkgreen',
+            }),
+          },
+        ],
+        {
+          updateOn: 'render',
+          backgroundColor: 'white',
+        }
+      );
+    </script>
+  </body>
+</html>

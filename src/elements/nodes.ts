@@ -120,7 +120,8 @@ export function renderPerNode(
 
   if (o.updateOn === 'render') {
     layer.updateOnRender = true;
-  } else {
+  }
+  if (!o.queryEachTime) {
     nodes = reevaluateCollection(nodes);
     layer.cy.on('add remove', o.selector, revaluateAndUpdateOnce);
   }
