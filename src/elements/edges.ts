@@ -66,7 +66,8 @@ export function renderPerEdge(
 
   if (o.updateOn === 'render') {
     layer.updateOnRender = true;
-  } else {
+  }
+  if (!o.queryEachTime) {
     edges = reevaluateCollection(edges);
     layer.cy.on('add remove', o.selector, revaluateAndUpdateOnce);
   }
