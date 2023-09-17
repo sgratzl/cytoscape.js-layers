@@ -1,6 +1,5 @@
 import type cy from 'cytoscape';
-import type { ICanvasLayer, IHTMLLayer, ISVGLayer, ILayer } from '../layers';
-import type { IRenderHint } from '../public';
+import type { ICanvasLayer, IHTMLLayer, ISVGLayer, ILayer, IRenderHint } from '../layers';
 import { SVG_NS } from '../layers/SVGLayer';
 import { matchNodes, registerCallback, ICallbackRemover, IMatchOptions } from './utils';
 import { IElementLayerOptions, defaultElementLayerOptions } from './common';
