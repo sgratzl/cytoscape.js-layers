@@ -337,24 +337,6 @@ export default class LayersPlugin {
       );
     }
 
-    const renderer = (
-      this.cy as unknown as {
-        renderer(): {
-          bufferCanvasImage(
-            o: cy.ExportJpgStringOptions | cy.ExportJpgBlobOptions | cy.ExportJpgBlobPromiseOptions
-          ): HTMLCanvasElement;
-        };
-      }
-    ).renderer();
-
-    const bg = options.bg;
-
-    const canvas = renderer.bufferCanvasImage({ ...options, bg: undefined });
-
-    const width = canvas.width;
-    const height = canvas.height;
-    const ctx = canvas.getContext('2d')!;
-
     const before = layers
       .slice(0, nodeIndex)
       .reverse()
@@ -364,27 +346,30 @@ export default class LayersPlugin {
       .slice(nodeIndex + 1)
       .filter((d) => d.supportsRender() && d !== this.dragLayer && d !== this.selectBoxLayer);
 
-    const scale = options.scale ?? 1;
+    const renderer = (
+      this.cy as unknown as {
+        renderer(): {
+          bufferCanvasImage(
+            o: cy.ExportJpgStringOptions | cy.ExportJpgBlobOptions | cy.ExportJpgBlobPromiseOptions
+          ): HTMLCanvasElement;
+          drawElements(ctx: CanvasRenderingContext2D, elems: cy.Collection): void;
+        };
+      }
+    ).renderer();
 
-    const hint = { scale, width, height, full: options.full ?? false };
-
-    ctx.globalCompositeOperation = 'destination-over';
-    for (const l of before) {
-      l.renderInto(ctx, hint);
-    }
-
-    ctx.globalCompositeOperation = 'source-over';
-    for (const l of after) {
-      l.renderInto(ctx, hint);
-    }
-
-    if (bg) {
-      ctx.globalCompositeOperation = 'destination-over';
-      ctx.fillStyle = bg;
-      ctx.rect(0, 0, width, height);
-      ctx.fill();
-    }
-
+    const drawElements = renderer.drawElements;
+    // patch with all levels
+    renderer.drawElements = function (ctx, elems) {
+      for (const l of before) {
+        l.renderInto(ctx);
+      }
+      drawElements.call(this, ctx, elems);
+      for (const l of after) {
+        l.renderInto(ctx);
+      }
+    };
+    const canvas = renderer.bufferCanvasImage(options);
+    renderer.drawElements = drawElements;
     return canvas;
   }
 

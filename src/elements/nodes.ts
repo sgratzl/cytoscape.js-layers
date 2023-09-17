@@ -1,5 +1,6 @@
 import type cy from 'cytoscape';
 import type { ICanvasLayer, IHTMLLayer, ISVGLayer, ILayer } from '../layers';
+import type { IRenderHint } from '../public';
 import { SVG_NS } from '../layers/SVGLayer';
 import { matchNodes, registerCallback, ICallbackRemover, IMatchOptions } from './utils';
 import { IElementLayerOptions, defaultElementLayerOptions } from './common';
@@ -140,7 +141,7 @@ export function renderPerNode(
 
   if (layer.type === 'canvas') {
     const oCanvas = o as INodeCanvasLayerOption;
-    const renderer = (ctx: CanvasRenderingContext2D) => {
+    const renderer = (ctx: CanvasRenderingContext2D, hint: IRenderHint) => {
       const t = ctx.getTransform();
       if (o.queryEachTime) {
         nodes = reevaluateCollection(nodes);
@@ -150,7 +151,7 @@ export function renderPerNode(
           return;
         }
         const bb = node.boundingBox(o.boundingBox);
-        if (oCanvas.checkBounds && !layer.inVisibleBounds(bb)) {
+        if (!hint.forExport && oCanvas.checkBounds && !layer.inVisibleBounds(bb)) {
           return;
         }
         if (oCanvas.position === 'top-left') {

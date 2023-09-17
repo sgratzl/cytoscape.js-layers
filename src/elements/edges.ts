@@ -1,5 +1,6 @@
 import type cy from 'cytoscape';
 import type { ICanvasLayer, IPoint } from '../layers';
+import type { IRenderHint } from '../public';
 import { ICallbackRemover, registerCallback } from './utils';
 import { IElementLayerOptions, defaultElementLayerOptions } from './common';
 
@@ -71,7 +72,7 @@ export function renderPerEdge(
     layer.cy.on('add remove', o.selector, revaluateAndUpdateOnce);
   }
 
-  const renderer = (ctx: CanvasRenderingContext2D) => {
+  const renderer = (ctx: CanvasRenderingContext2D, hint: IRenderHint) => {
     if (o.queryEachTime) {
       edges = reevaluateCollection(edges);
     }
@@ -90,7 +91,12 @@ export function renderPerEdge(
         impl && impl.startX != null && impl.startY != null ? { x: impl.startX, y: impl.startY } : edge.sourceEndpoint();
       const t = impl && impl.endX != null && impl.endY != null ? { x: impl.endX, y: impl.endY } : edge.targetEndpoint();
 
-      if (o.checkBounds && o.checkBoundsPointCount > 0 && !anyVisible(layer, s, t, o.checkBoundsPointCount)) {
+      if (
+        !hint.forExport &&
+        o.checkBounds &&
+        o.checkBoundsPointCount > 0 &&
+        !anyVisible(layer, s, t, o.checkBoundsPointCount)
+      ) {
         return;
       }
       if (impl && impl.pathCache) {
