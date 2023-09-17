@@ -74,4 +74,18 @@ namespace Annotations {
         a.click();
       });
   });
+  document.getElementById('png2')?.addEventListener('click', () => {
+    layers
+      .png({
+        output: 'blob-promise',
+        ignoreUnsupportedLayerOrder: true,
+        full: true,
+      })
+      .then((r) => {
+        const url = URL.createObjectURL(r);
+        const a = document.getElementById('url') as HTMLAnchorElement;
+        a.href = url;
+        a.click();
+      });
+  });
 }

@@ -7,7 +7,6 @@ import type {
   IHTMLStaticLayer,
   ISVGStaticLayer,
   ICanvasStaticLayer,
-  IRenderHint,
 } from './interfaces';
 import type cy from 'cytoscape';
 import type { ICanvasLayerOptions, ISVGLayerOptions, IHTMLLayerOptions } from './public';
@@ -39,7 +38,7 @@ export abstract class ABaseLayer implements IMoveAbleLayer {
     return false;
   }
 
-  renderInto(_ctx: CanvasRenderingContext2D, _hint: IRenderHint): void {
+  renderInto(_ctx: CanvasRenderingContext2D): void {
     // dummy
   }
 
