@@ -1,11 +1,4 @@
-import type {
-  ICanvasLayer,
-  ILayerElement,
-  ILayerImpl,
-  IRenderFunction,
-  ICanvasStaticLayer,
-  IRenderHint,
-} from './interfaces';
+import type { ICanvasLayer, ILayerElement, ILayerImpl, IRenderFunction, ICanvasStaticLayer } from './interfaces';
 import { layerStyle, stopClicks } from './utils';
 import { ABaseLayer, ILayerAdapter } from './ABaseLayer';
 import type { ICanvasLayerOptions } from './public';
@@ -86,7 +79,7 @@ export class CanvasBaseLayer extends ABaseLayer implements ILayerImpl {
     ctx.scale(this.transform.zoom * scale, this.transform.zoom * scale);
 
     for (const r of this.callbacks) {
-      r(ctx);
+      r(ctx, {});
     }
 
     ctx.restore();
@@ -96,8 +89,10 @@ export class CanvasBaseLayer extends ABaseLayer implements ILayerImpl {
     return true;
   }
 
-  renderInto(ctx: CanvasRenderingContext2D, hint: IRenderHint): void {
-    this.drawImpl(ctx, hint.scale);
+  renderInto(ctx: CanvasRenderingContext2D): void {
+    for (const r of this.callbacks) {
+      r(ctx, { forExport: true });
+    }
   }
 
   resize(width: number, height: number) {

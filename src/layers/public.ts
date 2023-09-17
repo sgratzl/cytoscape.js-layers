@@ -5,8 +5,12 @@ export interface IPoint {
   y: number;
 }
 
+export interface IRenderHint {
+  forExport?: boolean;
+}
+
 export interface IRenderFunction {
-  (ctx: CanvasRenderingContext2D): void;
+  (ctx: CanvasRenderingContext2D, hint: IRenderHint): void;
 }
 
 export interface IDOMUpdateFunction<T extends HTMLElement | SVGElement> {
