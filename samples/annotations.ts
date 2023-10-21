@@ -66,6 +66,7 @@ namespace Annotations {
       .png({
         output: 'blob-promise',
         ignoreUnsupportedLayerOrder: true,
+        bg: 'red',
       })
       .then((r) => {
         const url = URL.createObjectURL(r);
