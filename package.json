@@ -1,7 +1,7 @@
 {
   "name": "cytoscape-layers",
   "description": "Cytoscape.js plugin for rendering layers in SVG, DOM, or Canvas",
-  "version": "2.4.2",
+  "version": "2.4.3",
   "author": {
     "name": "Samuel Gratzl",
     "email": "sam@sgratzl.com",
@@ -21,7 +21,7 @@
   },
   "global": "CytoscapeLayers",
   "dependencies": {
-    "@types/cytoscape": "^3.19.10"
+    "@types/cytoscape": "^3.19.13"
   },
   "peerDependencies": {
     "cytoscape": "^3.23.0"
@@ -43,39 +43,43 @@
     "build",
     "src/**/*.ts"
   ],
+  "resolutions": {
+    "@typescript-eslint/eslint-plugin": "^6.8.0",
+    "@typescript-eslint/parser": "^6.8.0"
+  },
   "devDependencies": {
-    "@babel/core": "^7.22.8",
-    "@babel/preset-env": "^7.22.7",
-    "@rollup/plugin-babel": "^6.0.3",
-    "@rollup/plugin-commonjs": "^25.0.2",
-    "@rollup/plugin-node-resolve": "^15.1.0",
-    "@rollup/plugin-replace": "^5.0.2",
-    "@rollup/plugin-typescript": "^11.1.2",
-    "@types/jest": "^29.5.2",
-    "@typescript-eslint/eslint-plugin": "^5.61.0",
-    "@typescript-eslint/parser": "^5.61.0",
+    "@babel/core": "^7.23.2",
+    "@babel/preset-env": "^7.23.2",
+    "@rollup/plugin-babel": "^6.0.4",
+    "@rollup/plugin-commonjs": "^25.0.7",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-replace": "^5.0.4",
+    "@rollup/plugin-typescript": "^11.1.5",
+    "@types/jest": "^29.5.6",
+    "@typescript-eslint/eslint-plugin": "^6.8.0",
+    "@typescript-eslint/parser": "^6.8.0",
     "@yarnpkg/sdks": "^2.7.1",
-    "cytoscape": "^3.25.0",
-    "eslint": "^8.44.0",
-    "eslint-config-airbnb-typescript": "^17.0.0",
-    "eslint-config-prettier": "^8.8.0",
+    "cytoscape": "^3.26.0",
+    "eslint": "^8.52.0",
+    "eslint-config-airbnb-typescript": "^17.1.0",
+    "eslint-config-prettier": "^9.0.0",
     "eslint-config-react-app": "^7.0.1",
     "eslint-plugin-flowtype": "^8.0.3",
-    "eslint-plugin-import": "^2.27.5",
+    "eslint-plugin-import": "^2.28.1",
     "eslint-plugin-jsx-a11y": "^6.7.1",
-    "eslint-plugin-prettier": "^4.2.1",
-    "eslint-plugin-react": "^7.32.2",
+    "eslint-plugin-prettier": "^5.0.1",
+    "eslint-plugin-react": "^7.33.2",
     "eslint-plugin-react-hooks": "^4.6.0",
-    "jest": "^29.6.0",
-    "prettier": "^2.0.0",
-    "rimraf": "^5.0.1",
-    "rollup": "^3.26.2",
-    "rollup-plugin-dts": "^5.3.0",
+    "jest": "^29.7.0",
+    "prettier": "^3.0.3",
+    "rimraf": "^5.0.5",
+    "rollup": "^4.1.4",
+    "rollup-plugin-dts": "^6.1.0",
     "rollup-plugin-terser": "^7.0.2",
     "ts-jest": "^29.1.1",
-    "tslib": "^2.6.0",
-    "typedoc": "^0.24.8",
-    "typescript": "^5.1.6"
+    "tslib": "^2.6.2",
+    "typedoc": "^0.25.2",
+    "typescript": "^5.2.2"
   },
   "scripts": {
     "clean": "rimraf build node_modules \"*.tgz\" \"*.tsbuildinfo\" \"samples/*.js\" \"samples/*.map\"",
@@ -97,7 +101,7 @@
     "docs": "typedoc src/index.ts",
     "prepare": "yarn run build"
   },
-  "packageManager": "yarn@3.6.1",
+  "packageManager": "yarn@3.6.4",
   "dependenciesMeta": {
     "cytoscape@3.23.0": {
       "unplugged": true
