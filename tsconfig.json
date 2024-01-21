@@ -26,8 +26,8 @@
     "noEmit": true,
     "paths": {
       "@": ["./src"],
-      "*": ["*", "node_modules/*"]
-    }
+      "*": ["*", "node_modules/*"],
+    },
   },
   "include": ["src/**/*.ts", "src/**/*.tsx"],
 
@@ -38,6 +38,6 @@
     "excludeExternals": true,
     "excludePrivate": true,
     "includeVersion": true,
-    "hideGenerator": true
-  }
+    "hideGenerator": true,
+  },
 }
