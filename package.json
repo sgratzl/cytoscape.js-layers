@@ -1,7 +1,7 @@
 {
   "name": "cytoscape-layers",
   "description": "Cytoscape.js plugin for rendering layers in SVG, DOM, or Canvas",
-  "version": "2.4.5",
+  "version": "2.4.6",
   "author": {
     "name": "Samuel Gratzl",
     "email": "sam@sgratzl.com",
