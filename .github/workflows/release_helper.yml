@@ -23,17 +23,26 @@ jobs:
           node-version: 20
       - name: Extract version
         id: extract_version
-        run: node -pe "'::set-output name=version::' + require('./package.json').version"
+        run: |
+          node -pe "'version=' + require('./package.json').version" >> $GITHUB_OUTPUT
+          node -pe "'npm_tag=' + (require('./package.json').version.includes('-') ? 'next' : 'latest')" >> $GITHUB_OUTPUT
+      - name: Print version
+        run: |
+          echo "releasing ${{ steps.extract_version.outputs.version }} with tag ${{ steps.extract_version.outputs.npm_tag }}"
       - name: Create Release
         id: create_release
         uses: release-drafter/release-drafter@v6
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
+          name: v${{ steps.extract_version.outputs.version }}
+          tag: v${{ steps.extract_version.outputs.version }}
           version: ${{ steps.extract_version.outputs.version }}
+          prerelease: ${{ needs.create_release.outputs.tag_name == 'next' }}
           publish: true
     outputs:
       version: ${{ steps.extract_version.outputs.version }}
+      npm_tag: ${{ steps.extract_version.outputs.npm_tag }}
       upload_url: ${{ steps.create_release.outputs.upload_url }}
       tag_name: ${{ steps.create_release.outputs.tag_name }}
 
@@ -66,12 +75,11 @@ jobs:
           files: 'package.tgz'
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           release-tag: ${{ needs.create_release.outputs.tag_name }}
-      - name: Publish to NPM
-        uses: JS-DevTools/npm-publish@v3
-        with:
-          token: ${{ secrets.NPM_TOKEN }}
-          access: public
-          check-version: true
+      - name: Pack Publish
+        run: |
+          yarn config set npmAuthToken "${{ secrets.NPM_TOKEN }}"
+          yarn pack
+          yarn npm publish --tag "${{ needs.create_release.outputs.npm_tag }}"
 
   sync_dev:
     needs: correct_repository

@@ -101,6 +101,7 @@ export class CanvasBaseLayer extends ABaseLayer implements ILayerImpl {
     this.update();
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   setViewport(_tx: number, _ty: number, _zoom: number) {
     // dummy
   }
