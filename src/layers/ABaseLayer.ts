@@ -38,6 +38,7 @@ export abstract class ABaseLayer implements IMoveAbleLayer {
     return false;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   renderInto(_ctx: CanvasRenderingContext2D): void {
     // dummy
   }

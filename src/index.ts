@@ -11,9 +11,8 @@ export default function register(
 }
 
 // auto register
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
 if (typeof (window as any).cytoscape !== 'undefined') {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   register((window as any).cytoscape);
 }
 
