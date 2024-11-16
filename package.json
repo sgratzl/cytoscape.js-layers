@@ -54,7 +54,7 @@
   "devDependencies": {
     "@babel/core": "^7.26.0",
     "@babel/preset-env": "^7.26.0",
-    "@eslint/js": "^9.15.0",
+    "@eslint/js": "~9.14.0",
     "@rollup/plugin-babel": "^6.0.4",
     "@rollup/plugin-commonjs": "^28.0.1",
     "@rollup/plugin-node-resolve": "^15.3.0",
@@ -63,7 +63,7 @@
     "@vitest/coverage-v8": "^2.1.5",
     "@yarnpkg/sdks": "^3.2.0",
     "cytoscape": "^3.30.3",
-    "eslint": "^9.15.0",
+    "eslint": "~9.14.0",
     "eslint-plugin-prettier": "^5.2.1",
     "jsdom": "^25.0.1",
     "prettier": "^3.3.3",
