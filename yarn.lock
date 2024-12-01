@@ -2844,9 +2844,9 @@ __metadata:
   linkType: soft
 
 "cytoscape@npm:^3.30.3":
-  version: 3.30.3
-  resolution: "cytoscape@npm:3.30.3"
-  checksum: 10c0/11ec56acf6785b44a703561b6f78b753e414bd6ccbf4ef3dfa5209379d2b32880ae1f3181076065a10ecb57f2bebd91781309128a28aa17a216ee3bd1a9a0f50
+  version: 3.30.4
+  resolution: "cytoscape@npm:3.30.4"
+  checksum: 10c0/5973a7d4a079f65984fe48bce1f6e4377d31407b7054ba11297f9ba2a485f3fc06f26ab9d97a09fded84f0bfdbb9a2f1749884145c17618a0a4cec32b6c8bfce
   languageName: node
   linkType: hard
 
