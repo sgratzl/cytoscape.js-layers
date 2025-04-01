@@ -64,7 +64,7 @@
     "@vitest/coverage-v8": "^2.1.8",
     "@yarnpkg/sdks": "^3.2.0",
     "cytoscape": "^3.30.4",
-    "eslint": "~9.17.0",
+    "eslint": "~9.23.0",
     "eslint-plugin-prettier": "^5.2.1",
     "jsdom": "^25.0.1",
     "prettier": "^3.4.2",
