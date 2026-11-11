@@ -78,14 +78,14 @@ export default class LayersPlugin {
         if (isPoint(p)) {
           return inX(p.x) && inY(p.y);
         }
-        // any of the four corners or the center are inside
-        return (
-          (inX(p.x1) && inY(p.y1)) ||
-          (inX(p.x2) && inY(p.y1)) ||
-          (inX(p.x2) && inY(p.y2)) ||
-          (inX(p.x1) && inY(p.y2)) ||
-          (inX((p.x1 + p.x2) / 2) && inY((p.y1 + p.y2) / 2))
-        );
+        // A bounding box is visible when it overlaps the viewport. Checking
+        // only its corners and center incorrectly culls large partially visible
+        // boxes whose sampled points are all outside the viewport.
+        const px1 = p.x1 * v.zoom + v.tx;
+        const px2 = p.x2 * v.zoom + v.tx;
+        const py1 = p.y1 * v.zoom + v.ty;
+        const py2 = p.y2 * v.zoom + v.ty;
+        return px1 <= v.width && px2 >= 0 && py1 <= v.height && py2 >= 0;
       },
     };
 
